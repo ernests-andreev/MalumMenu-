@@ -7,11 +7,11 @@ public static class AmongUsClient_Update
 {
     public static void Postfix()
     {
-        MalumSpoof.SpoofLevel();
+        MalumSpoof.SpoofLevel();        // Подмена уровня игрока
 
-        // GuestMode cheats are commented out as they are broken in latest updates
+        // Читы GuestMode закомментированы, так как сломаны в последних обновлениях
 
-        // Code to treat temp accounts the same as full accounts, including access to friend codes
+        // Код для обработки временных аккаунтов как полных, включая доступ к кодам друзей
         // if (!EOSManager.Instance.loginFlowFinished || !MalumMenu.guestMode.Value) return;
         // DataManager.Player.Account.LoginStatus = EOSManager.AccountLoginStatus.LoggedIn;
 
@@ -27,7 +27,7 @@ public static class AmongUsClient_Update
 [HarmonyPatch(typeof(AmongUsClient), nameof(AmongUsClient.OnGameJoined))]
 public static class AmongUsClient_OnGameJoined
 {
-    // Postfix patch of AmongUsClient.OnGameJoined to store the last joined game ID string
+    // Постфикс-патч AmongUsClient.OnGameJoined для сохранения строки ID последней присоединённой игры
     public static string lastGameIdString = "";
 
     public static void Postfix(string gameIdString)
@@ -42,7 +42,7 @@ public static class AmongUsClient_CoStartGame
     public static void Postfix()
     {
         if (CheatToggles.logGameState)
-            ConsoleUI.Log("Game started");
+            ConsoleUI.Log("Игра началась");
     }
 }
 
@@ -52,6 +52,6 @@ public static class AmongUsClient_OnGameEnd
     public static void Postfix(EndGameResult endGameResult)
     {
         if (CheatToggles.logGameState)
-            ConsoleUI.Log($"Game ended with reason {endGameResult.GameOverReason}");
+            ConsoleUI.Log($"Игра завершилась с причиной {endGameResult.GameOverReason}");
     }
 }
