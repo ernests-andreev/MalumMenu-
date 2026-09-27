@@ -5,16 +5,16 @@ namespace MalumMenu;
 
 public class DoorsUI : MonoBehaviour
 {
-    public static int windowHeight = 270;
-    public static int windowWidth = 480;
-    public static Rect windowRect;
+    public static int windowHeight = 270;                               // Высота окна
+    public static int windowWidth = 480;                                // Ширина окна
+    public static Rect windowRect;                                      // Прямоугольник окна
 
-    private List<SystemTypes> _doorsToSpamOpen = new();
-    private List<SystemTypes> _doorsToSpamClose = new();
+    private List<SystemTypes> _doorsToSpamOpen = new();                 // Двери для спам-открытия
+    private List<SystemTypes> _doorsToSpamClose = new();                // Двери для спам-закрытия
 
     private void Start()
     {
-        // Instantiate 2D area of DoorsUI
+        // Создаём 2D-область DoorsUI
         windowRect = new(
             Screen.width / 2f - windowWidth / 2f,
             Screen.height / 2f - windowHeight / 2f,
@@ -27,14 +27,14 @@ public class DoorsUI : MonoBehaviour
     {
         if (!CheatToggles.showDoorsMenu || !(MenuUI.isGUIActive || MalumMenu.menuKeepSubwindowsOpen.Value) || MalumMenu.isPanicked) return;
 
-        UIHelpers.ApplyUIColor();
+        UIHelpers.ApplyUIColor();       // Применить пользовательский цвет UI
 
-        windowRect = GUI.Window((int)WindowId.DoorsUI, windowRect, (GUI.WindowFunction)DoorsWindow, "Doors");
+        windowRect = GUI.Window((int)WindowId.DoorsUI, windowRect, (GUI.WindowFunction)DoorsWindow, "Двери");  // Заголовок окна: "Двери"
     }
 
     private void DoorsWindow(int windowID)
     {
-        if (!Utils.isShip)
+        if (!Utils.isShip)              // Если нет корабля — окно неактивно
         {
             GUI.DragWindow();
             return;
@@ -42,7 +42,7 @@ public class DoorsUI : MonoBehaviour
 
         var map = (MapNames)Utils.GetCurrentMapID();
 
-        if (map is MapNames.MiraHQ)
+        if (map is MapNames.MiraHQ)     // На MiraHQ дверей нет
         {
             GUI.DragWindow();
             return;
@@ -50,35 +50,40 @@ public class DoorsUI : MonoBehaviour
 
         GUILayout.BeginVertical();
 
-        foreach (var doorRoom in DoorsHandler.GetRoomsWithDoors())
+        foreach (var doorRoom in DoorsHandler.GetRoomsWithDoors())       // Проходим по всем комнатам с дверями
         {
             GUILayout.BeginHorizontal();
 
+            // Название комнаты
             GUILayout.Label($"{doorRoom.ToString()}", GUILayout.Width(110f));
 
             GUILayout.BeginHorizontal();
 
+            // Статус дверей в комнате
             GUILayout.Label($"{DoorsHandler.GetStatusOfDoorsInRoom(doorRoom, true)}");
 
             GUILayout.FlexibleSpace();
 
-            if (GUILayout.Button("Close", GUIStylePreset.NormalButton, GUILayout.Width(50f)))
+            // Кнопка "Закрыть"
+            if (GUILayout.Button("Закрыть", GUIStylePreset.NormalButton, GUILayout.Width(50f)))
             {
                 DoorsHandler.CloseDoorsInRoom(doorRoom);
             }
 
+            // Кнопка "Открыть" (доступна только на Polus, Airship, Fungle)
             if (map is MapNames.Polus or MapNames.Airship or MapNames.Fungle)
             {
-                if (GUILayout.Button("Open", GUIStylePreset.NormalButton, GUILayout.Width(50f)))
+                if (GUILayout.Button("Открыть", GUIStylePreset.NormalButton, GUILayout.Width(50f)))
                 {
                     DoorsHandler.OpenDoorsInRoom(doorRoom);
                 }
             }
 
-            if (Utils.isHost)
+            if (Utils.isHost)       // Переключатели спама — только для хоста
             {
+                // Спам-закрытие конкретной комнаты
                 var spamClose = _doorsToSpamClose.Contains(doorRoom);
-                spamClose = GUILayout.Toggle(spamClose, "Spam Close", GUIStylePreset.NormalToggle);
+                spamClose = GUILayout.Toggle(spamClose, "Спам-закрыть", GUIStylePreset.NormalToggle);
 
                 if (spamClose && !_doorsToSpamClose.Contains(doorRoom))
                 {
@@ -89,10 +94,11 @@ public class DoorsUI : MonoBehaviour
                     _doorsToSpamClose.Remove(doorRoom);
                 }
 
+                // Спам-открытие конкретной комнаты (только на Polus, Airship, Fungle)
                 if (map is MapNames.Polus or MapNames.Airship or MapNames.Fungle)
                 {
                     var spamOpen = _doorsToSpamOpen.Contains(doorRoom);
-                    spamOpen = GUILayout.Toggle(spamOpen, "Spam Open", GUIStylePreset.NormalToggle);
+                    spamOpen = GUILayout.Toggle(spamOpen, "Спам-открыть", GUIStylePreset.NormalToggle);
 
                     if (spamOpen && !_doorsToSpamOpen.Contains(doorRoom))
                     {
@@ -106,7 +112,7 @@ public class DoorsUI : MonoBehaviour
             }
             else
             {
-                // Clear spam lists if not host
+                // Очищаем списки спама, если мы не хост
                 if (_doorsToSpamClose.Count != 0 || _doorsToSpamOpen.Count != 0)
                 {
                     _doorsToSpamClose.Clear();
@@ -121,19 +127,21 @@ public class DoorsUI : MonoBehaviour
 
         GUILayout.FlexibleSpace();
 
-        GUILayout.Box("", GUIStylePreset.Separator, GUILayout.Height(1f), GUILayout.ExpandWidth(true));
+        GUILayout.Box("", GUIStylePreset.Separator, GUILayout.Height(1f), GUILayout.ExpandWidth(true));   // Разделитель
         GUILayout.Space(1f);
 
         GUILayout.BeginHorizontal();
 
-        if (GUILayout.Button("Close All", GUIStylePreset.NormalButton))
+        // Кнопка "Закрыть все"
+        if (GUILayout.Button("Закрыть все", GUIStylePreset.NormalButton))
         {
             CheatToggles.closeAllDoors = true;
         }
 
+        // Кнопка "Открыть все" (только на Polus, Airship, Fungle)
         if (map is MapNames.Polus or MapNames.Airship or MapNames.Fungle)
         {
-            if (GUILayout.Button("Open All", GUIStylePreset.NormalButton))
+            if (GUILayout.Button("Открыть все", GUIStylePreset.NormalButton))
             {
                 CheatToggles.openAllDoors = true;
             }
@@ -141,13 +149,13 @@ public class DoorsUI : MonoBehaviour
 
         GUILayout.FlexibleSpace();
 
-        if (Utils.isHost)
+        if (Utils.isHost)       // Спам-переключатели для всех дверей — только для хоста
         {
-            CheatToggles.spamCloseAllDoors = GUILayout.Toggle(CheatToggles.spamCloseAllDoors, "Spam Close All", GUIStylePreset.NormalToggle);
+            CheatToggles.spamCloseAllDoors = GUILayout.Toggle(CheatToggles.spamCloseAllDoors, "Спам-закрыть все", GUIStylePreset.NormalToggle);
 
             if (map is MapNames.Polus or MapNames.Airship or MapNames.Fungle)
             {
-                CheatToggles.spamOpenAllDoors = GUILayout.Toggle(CheatToggles.spamOpenAllDoors, "Spam Open All", GUIStylePreset.NormalToggle);
+                CheatToggles.spamOpenAllDoors = GUILayout.Toggle(CheatToggles.spamOpenAllDoors, "Спам-открыть все", GUIStylePreset.NormalToggle);
             }
         }
         else
@@ -159,20 +167,20 @@ public class DoorsUI : MonoBehaviour
 
         GUILayout.EndVertical();
 
-        GUI.DragWindow();
+        GUI.DragWindow();       // Позволяет перетаскивать окно
     }
 
     public void Update()
     {
         if (!Utils.isShip) return;
 
-        // Spam close selected doors
+        // Спам-закрытие выбранных дверей
         foreach (var doorRoom in _doorsToSpamClose)
         {
             DoorsHandler.CloseDoorsInRoom(doorRoom);
         }
 
-        // Spam open selected doors
+        // Спам-открытие выбранных дверей
         var map = (MapNames)Utils.GetCurrentMapID();
 
         if (map is MapNames.Polus or MapNames.Airship or MapNames.Fungle)
