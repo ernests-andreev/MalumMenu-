@@ -1,14 +1,16 @@
 using System.Collections.Generic;
 
-// Custom equality comparer for NetworkedPlayerInfo that uses ClientId
-// Allows for reliable equality comparison in collections even if cosmetics, color, etc. change
+// Пользовательский компаратор равенства для NetworkedPlayerInfo, использующий ClientId
+// Позволяет надёжно сравнивать объекты в коллекциях, даже если косметика, цвет и т.д. изменятся
 public sealed class NetPlayerInfoCidComparer : IEqualityComparer<NetworkedPlayerInfo>
 {
+    // Проверка равенства двух игроков по их ClientId
     public bool Equals(NetworkedPlayerInfo data1, NetworkedPlayerInfo data2)
     {
         return data1.ClientId == data2.ClientId;
     }
 
+    // Возвращает хеш-код на основе ClientId
     public int GetHashCode(NetworkedPlayerInfo data)
     {
         return data.ClientId;
