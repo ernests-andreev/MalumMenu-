@@ -6,32 +6,32 @@ namespace MalumMenu;
 
 public class MenuUI : MonoBehaviour
 {
-    public static int windowHeight = 550;
-    public static int windowWidth = 700;
-    public static Rect windowRect;
+    public static int windowHeight = 550;                               // Высота окна
+    public static int windowWidth = 700;                                // Ширина окна
+    public static Rect windowRect;                                      // Прямоугольник окна
 
-    public static bool isGUIActive = false;
-    private List<ITab> _tabs = new();
-    private int _selectedTab;
-    public static float hue; // For RGB mode
+    public static bool isGUIActive = false;                             // Активен ли GUI
+    private List<ITab> _tabs = new();                                   // Список вкладок
+    private int _selectedTab;                                           // Выбранная вкладка
+    public static float hue; // Для RGB-режима
 
     private void Start()
     {
-        // Add all tabs on start
-        _tabs.Add(new MovementTab());
-        _tabs.Add(new ESPTab());
-        _tabs.Add(new RolesTab());
-        _tabs.Add(new ShipTab());
-        _tabs.Add(new ChatTab());
-        _tabs.Add(new AnimationsTab());
-        _tabs.Add(new ConsoleTab());
-        _tabs.Add(new HostOnlyTab());
-        _tabs.Add(new PassiveTab());
-        _tabs.Add(new ModesTab());
-        _tabs.Add(new ConfigTab());
-        // _tabs.Add(new OverloadTab());
+        // Добавляем все вкладки при старте
+        _tabs.Add(new MovementTab());       // Движение
+        _tabs.Add(new ESPTab());            // ESP
+        _tabs.Add(new RolesTab());          // Роли
+        _tabs.Add(new ShipTab());           // Корабль
+        _tabs.Add(new ChatTab());           // Чат
+        _tabs.Add(new AnimationsTab());     // Анимации
+        _tabs.Add(new ConsoleTab());        // Консоль
+        _tabs.Add(new HostOnlyTab());       // Только для хоста
+        _tabs.Add(new PassiveTab());        // Пассивные
+        _tabs.Add(new ModesTab());          // Режимы
+        _tabs.Add(new ConfigTab());         // Конфиг
+        // _tabs.Add(new OverloadTab());    // Перегрузка (закомментировано)
 
-        // Instantiate 2D area of MenuUI
+        // Создаём 2D-область MenuUI
         windowRect = new(
             Screen.width / 2f - windowWidth / 2f,
             Screen.height / 2f - windowHeight / 2f,
@@ -42,29 +42,30 @@ public class MenuUI : MonoBehaviour
 
     public void InitStyles()
     {
+        // Задаём размер шрифта для переключателей, кнопок и меток
         GUI.skin.toggle.fontSize = GUI.skin.button.fontSize = GUI.skin.label.fontSize = 15;
     }
 
     private void Update()
     {
 
+        // Включение/выключение GUI клавишей (по умолчанию DELETE)
         if (Input.GetKeyDown(Utils.StringToKeycode(MalumMenu.menuKeybind.Value)))
         {
-            // Enable or disable GUI with DELETE key
             isGUIActive = !isGUIActive;
 
             if (MalumMenu.menuOpenOnMouse.Value)
             {
-                // Teleport the window to the mouse for immediate use
+                // Перемещаем окно к мыши для немедленного использования
                 Vector2 mousePosition = Input.mousePosition;
                 windowRect.position = new Vector2(mousePosition.x, Screen.height - mousePosition.y);
             }
         }
 
-        if (CheatToggles.rgbMode)
+        if (CheatToggles.rgbMode)       // Режим радужного цвета
         {
-            hue += Time.deltaTime * 0.3f; // Adjust speed of color change, higher multiplier = faster
-            if (hue > 1f) hue -= 1f; // Loop hue back to 0 when it exceeds 1
+            hue += Time.deltaTime * 0.3f; // Скорость смены цвета (больше множитель = быстрее)
+            if (hue > 1f) hue -= 1f;      // Зацикливаем оттенок
         }
 
         if (CheatToggles.stealthMode != MalumMenu.inStealthMode)
@@ -73,42 +74,44 @@ public class MenuUI : MonoBehaviour
 
             Scene scene = SceneManager.GetActiveScene();
 
+            // Перезагружаем сцену, чтобы применить скрытный режим
             if (scene.name == "MainMenu" || scene.name == "MatchMaking")
             {
                 SceneManager.LoadScene(scene.name);
             }
         }
 
-        if (CheatToggles.panicMode) Utils.Panic();
+        if (CheatToggles.panicMode) Utils.Panic();      // Аварийное отключение
 
+        // Скрыть штамп мода в скрытном режиме/панике
         var stamp = ModManager.Instance.ModStamp;
         if (stamp) stamp.enabled = !(MalumMenu.inStealthMode || MalumMenu.isPanicked);
 
-        if (CheatToggles.openConfig)
+        if (CheatToggles.openConfig)                    // Открыть конфиг
         {
             Utils.OpenConfigFile();
             CheatToggles.openConfig = false;
         }
 
-        if (CheatToggles.reloadConfig)
+        if (CheatToggles.reloadConfig)                  // Перезагрузить конфиг
         {
             MalumMenu.Plugin.Config.Reload();
             CheatToggles.reloadConfig = false;
         }
 
-        if (CheatToggles.saveProfile)
+        if (CheatToggles.saveProfile)                   // Сохранить профиль
         {
-            CheatToggles.saveProfile = false; // Disable first to avoid saving it to profile
+            CheatToggles.saveProfile = false; // Сначала выключаем, чтобы не сохранить это в профиль
             CheatToggles.SaveTogglesToProfile();
         }
 
-        if (CheatToggles.loadProfile)
+        if (CheatToggles.loadProfile)                   // Загрузить профиль
         {
             CheatToggles.LoadTogglesFromProfile();
             CheatToggles.loadProfile = false;
         }
 
-        // Some cheats only work if the LocalPlayer exists, so they are turned off if it does not
+        // Некоторые читы работают только если LocalPlayer существует — иначе отключаем
         if(!Utils.isPlayer)
         {
             CheatToggles.setFakeRole = false;
@@ -129,7 +132,7 @@ public class MenuUI : MonoBehaviour
             }
         }
 
-        // Some cheats only work if the ship exists, so they are turned off if it does not
+        // Некоторые читы работают только если корабль существует — иначе отключаем
         if(!Utils.isShip)
         {
             CheatToggles.sabotageMap = false;
@@ -152,6 +155,7 @@ public class MenuUI : MonoBehaviour
             MalumCheats.StopShipAnimCheats();
         }
 
+        // Некоторые читы работают только если мы хост — иначе отключаем
         if(!Utils.isHost && !Utils.isFreePlay)
         {
             CheatToggles.killAll = false;
@@ -172,7 +176,7 @@ public class MenuUI : MonoBehaviour
             CheatToggles.noOptionsLimits = false;
         }
 
-        // Some cheats only work if in a meeting, so they are turned off if it does not
+        // Некоторые читы работают только во время собрания — иначе отключаем
         if (!Utils.isMeeting)
         {
             CheatToggles.skipMeeting = false;
@@ -186,8 +190,9 @@ public class MenuUI : MonoBehaviour
 
         InitStyles();
 
-        UIHelpers.ApplyUIColor();
+        UIHelpers.ApplyUIColor();       // Применить пользовательский цвет UI
 
+        // Заголовок окна: "MalumMenu v3.3.0"
         windowRect = GUI.Window((int)WindowId.MenuUI, windowRect, (GUI.WindowFunction)WindowFunction, "MalumMenu v" + MalumMenu.malumVersion);
     }
 
@@ -195,17 +200,19 @@ public class MenuUI : MonoBehaviour
     {
         GUILayout.BeginHorizontal();
 
-        // Left tab selector (15% width)
+        // Левый селектор вкладок (15% ширины)
         GUILayout.BeginVertical(GUILayout.Width(windowWidth * 0.15f));
         for (var i = 0; i < _tabs.Count; i++)
         {
             Color standardColor = GUI.backgroundColor;
 
+            // Подсветка выбранной вкладки
             if (_selectedTab == i)
             {
                 GUI.backgroundColor = new Color(0.2f, 0.2f, 0.2f);
             }
 
+            // Кнопка вкладки
             if (GUILayout.Button(_tabs[i].name, GUIStylePreset.TabButton, GUILayout.Height(35)))
                 _selectedTab = i;
 
@@ -214,25 +221,25 @@ public class MenuUI : MonoBehaviour
         }
         GUILayout.EndVertical();
 
-        // Vertical separator line + invisible space to create gap between the tab selector and the content
+        // Вертикальная линия-разделитель + отступ между селектором и содержимым
         GUILayout.Box("", GUIStylePreset.Separator, GUILayout.Width(1f), GUILayout.ExpandHeight(true));
         GUILayout.Space(10f);
 
-        // Right tab content and controls (85% width)
+        // Содержимое вкладки и элементы управления (85% ширины)
         GUILayout.BeginVertical(GUILayout.Width(windowWidth * 0.85f));
 
-        // Tab-specific content
+        // Контент выбранной вкладки
         if (_selectedTab >= 0 && _selectedTab < _tabs.Count)
         {
-            GUILayout.Label(_tabs[_selectedTab].name, GUIStylePreset.TabTitle);
-            _tabs[_selectedTab].Draw();
+            GUILayout.Label(_tabs[_selectedTab].name, GUIStylePreset.TabTitle);    // Заголовок вкладки
+            _tabs[_selectedTab].Draw();                                             // Отрисовка вкладки
         }
 
         GUILayout.EndVertical();
 
         GUILayout.EndHorizontal();
 
-        // Make the window draggable
+        // Позволяет перетаскивать окно
         GUI.DragWindow();
     }
 }
