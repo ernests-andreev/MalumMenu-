@@ -12,7 +12,7 @@ namespace MalumMenu;
 [HarmonyPatch(typeof(Constants), nameof(Constants.GetPlatformData))]
 public static class Constants_GetPlatformData
 {
-    // Postfix patch of Constants.GetPlatformData to spoof the user's platform type
+    // Постфикс-патч Constants.GetPlatformData для подмены типа платформы пользователя
     public static void Postfix(ref PlatformSpecificData __result)
     {
         if (Utils.StringToPlatformType(MalumMenu.spoofPlatform.Value, out Platforms? platformType))
@@ -29,9 +29,9 @@ public static class Constants_GetPlatformData
 [HarmonyPatch(typeof(GameData), nameof(GameData.HandleDisconnect), new[] { typeof(PlayerControl), typeof(DisconnectReasons) })]
 public static class GameData_HandleDisconnect
 {
-    public static HashSet<int> disconnectQueue = new();
+    public static HashSet<int> disconnectQueue = new();     // Очередь отключений
 
-    // Prefix patch of GameData.HandleDisconnect to keep track of successful overloads
+    // Префикс-патч GameData.HandleDisconnect для отслеживания успешных перегрузок
     public static void Prefix(PlayerControl player)
     {
         if (!CheatToggles.runOverload) return;
@@ -44,8 +44,8 @@ public static class GameData_HandleDisconnect
         if (isTarget) disconnectQueue.Add(playerData.ClientId);
     }
 
-    // Postfix patch of GameData.HandleDisconnect to keep track of successful overloads
-    // (Avoids race-condition double counting)
+    // Постфикс-патч GameData.HandleDisconnect для отслеживания успешных перегрузок
+    // (избегает двойного подсчёта из-за race-condition)
     public static void Postfix(PlayerControl player)
     {
         if (!CheatToggles.runOverload) return;
@@ -61,13 +61,13 @@ public static class GameData_HandleDisconnect
 
             if (CheatToggles.olLogDisconnect)
             {
-                int total = OverloadUI.currentTargets.Count // Targets still connected
-                            + OverloadUI.numSuccesses // Targets already crashed
-                            - disconnectQueue.Count; // Pending disconnect logs (Avoids race-condition double counting)
+                int total = OverloadUI.currentTargets.Count // Цели, всё ещё подключённые
+                            + OverloadUI.numSuccesses // Цели, уже вылетевшие
+                            - disconnectQueue.Count; // Ожидающие логи отключений (избегает двойного подсчёта)
 
                 string colorStr = ColorUtility.ToHtmlStringRGB(Color.green);
 
-                OverloadUI.LogConsole($"> <b><color=#{colorStr}>!! {playerData.DefaultOutfit.PlayerName} (ID : {playerData.ClientId}) Disconnected !! - [{OverloadUI.numSuccesses}/{total}]</color></b>");
+                OverloadUI.LogConsole($"> <b><color=#{colorStr}>!! {playerData.DefaultOutfit.PlayerName} (ID : {playerData.ClientId}) Отключён !! - [{OverloadUI.numSuccesses}/{total}]</color></b>");
             }
 
             disconnectQueue.Remove(clientId);
@@ -78,25 +78,25 @@ public static class GameData_HandleDisconnect
 [HarmonyPatch(typeof(FreeChatInputField), nameof(FreeChatInputField.UpdateCharCount))]
 public static class FreeChatInputField_UpdateCharCount
 {
-    // Postfix patch of FreeChatInputField.UpdateCharCount to change how charCountText displays
+    // Постфикс-патч FreeChatInputField.UpdateCharCount для изменения отображения charCountText
     public static void Postfix(FreeChatInputField __instance)
     {
-        // Only works if CheatToggles.longerMsgs is enabled
+        // Работает только если включён CheatToggles.longerMessages
         if (!CheatToggles.longerMessages) return;
 
-        // Update charCountText to account for longer characterLimit
+        // Обновляем charCountText с учётом увеличенного лимита символов
         int length = __instance.textArea.text.Length;
         __instance.charCountText.SetText($"{length}/{__instance.textArea.characterLimit}");
 
-        if (length < 90) // Under 75%
+        if (length < 90) // Меньше 75%
         {
             __instance.charCountText.color = Color.black;
         }
-        else if (length < 120) // Under 100%
+        else if (length < 120) // Меньше 100%
         {
             __instance.charCountText.color = new Color(1f, 1f, 0f, 1f);
         }
-        else // Over or equal to 100%
+        else // 100% или больше
         {
             __instance.charCountText.color = Color.red;
         }
@@ -115,8 +115,8 @@ public static class ChatBubble_SetName
 [HarmonyPatch(typeof(SystemInfo), nameof(SystemInfo.deviceUniqueIdentifier), MethodType.Getter)]
 public static class SystemInfo_deviceUniqueIdentifier_Getter
 {
-    // Postfix patch of SystemInfo.deviceUniqueIdentifier Getter method
-    // Made to hide the user's real unique deviceId by generating a random fake one
+    // Постфикс-патч геттера SystemInfo.deviceUniqueIdentifier
+    // Сделан для сокрытия реального уникального deviceId путём генерации случайного фейкового
     public static void Postfix(ref string __result)
     {
         if (!MalumMenu.spoofDeviceId.Value) return;
@@ -134,18 +134,18 @@ public static class SystemInfo_deviceUniqueIdentifier_Getter
 [HarmonyPatch(typeof(VersionShower), nameof(VersionShower.Start))]
 public static class VersionShower_Start
 {
-    // Postfix patch of VersionShower.Start to show MalumMenu version
+    // Постфикс-патч VersionShower.Start для отображения версии MalumMenu
     public static void Postfix(VersionShower __instance)
     {
         if (MalumMenu.inStealthMode || MalumMenu.isPanicked) return;
 
-        if (MalumMenu.supportedAU.Contains(Application.version)) // Checks if Among Us version is supported
+        if (MalumMenu.supportedAU.Contains(Application.version)) // Проверяет, поддерживается ли версия Among Us
         {
-            __instance.text.text =  $"MalumMenu v{MalumMenu.malumVersion} (v{Application.version})"; // Supported
+            __instance.text.text =  $"MalumMenu v{MalumMenu.malumVersion} (v{Application.version})"; // Поддерживается
         }
         else
         {
-            __instance.text.text =  $"MalumMenu v{MalumMenu.malumVersion} (<color=red>v{Application.version}</color>)"; // Unsupported
+            __instance.text.text =  $"MalumMenu v{MalumMenu.malumVersion} (<color=red>v{Application.version}</color>)"; // Не поддерживается
         }
     }
 }
@@ -153,7 +153,7 @@ public static class VersionShower_Start
 [HarmonyPatch(typeof(PingTracker), nameof(PingTracker.Update))]
 public static class PingTracker_Update
 {
-    // Postfix patch of PingTracker.Update to show MalumMenu authors and colored ping text
+    // Постфикс-патч PingTracker.Update для отображения авторов MalumMenu и цветного текста пинга
     public static void Postfix(PingTracker __instance)
     {
         if (MalumMenu.inStealthMode)
@@ -166,18 +166,18 @@ public static class PingTracker_Update
         __instance.text.alignment = TMPro.TextAlignmentOptions.Center;
 
         int ping = Utils.GetPing();
-        string pingText = Utils.GetColoredPingText($"PING: {ping} ms", ping);
+        string pingText = Utils.GetColoredPingText($"ПИНГ: {ping} мс", ping);
 
         if (AmongUsClient.Instance.IsGameStarted)
         {
             __instance.aspectPosition.DistanceFromEdge = new Vector3(-0.21f, 0.50f, 0f);
 
-            __instance.text.text = $"MalumMenu by scp222thj & Astral ~ {pingText}";
+            __instance.text.text = $"MM RU | Поджигатель мабоев - Альфредо ~ {pingText}";
 
             return;
         }
 
-        __instance.text.text = $"MalumMenu by scp222thj & Astral\n{pingText}";
+        __instance.text.text = $"MM RU | Поджигатель мабоев - Альфредо\n{pingText}";
 
     }
 }
@@ -185,34 +185,34 @@ public static class PingTracker_Update
 [HarmonyPatch(typeof(DisconnectPopup), nameof(DisconnectPopup.DoShow))]
 public static class DisconnectPopup_DoShow
 {
-    // Postfix patch of DisconnectPopup.DoShow to copy lobby code to clipboard on disconnect
+    // Постфикс-патч DisconnectPopup.DoShow для копирования кода лобби в буфер обмена при отключении
     public static void Postfix(DisconnectPopup __instance)
     {
         if (!CheatToggles.copyLobbyCodeOnDisconnect) return;
 
         GUIUtility.systemCopyBuffer = AmongUsClient_OnGameJoined.lastGameIdString;
 
-        __instance.SetText(__instance._textArea.text + "\n\n<size=60%>Lobby code has been copied to the clipboard</size>");
+        __instance.SetText(__instance._textArea.text + "\n\n<size=60%>Код лобби скопирован в буфер обмена</size>");
     }
 }
 
 [HarmonyPatch(typeof(PlayerBanData), nameof(PlayerBanData.BanMinutesLeft), MethodType.Getter)]
 public static class PlayerBanData_BanMinutesLeft_Getter
 {
-    // Postfix patch of PlayerBanData.BanMinutesLeft Getter method to remove disconnect penalty
+    // Постфикс-патч геттера PlayerBanData.BanMinutesLeft для снятия штрафа за отключение
     public static void Postfix(PlayerBanData __instance, ref int __result)
     {
         if (!CheatToggles.avoidPenalties) return;
 
-        __instance.BanPoints = 0f; // Removes all BanPoints
-        __result = 0; // Removes all BanMinutes
+        __instance.BanPoints = 0f; // Убирает все BanPoints
+        __result = 0; // Убирает все BanMinutes
     }
 }
 
 [HarmonyPatch(typeof(FullAccount), nameof(FullAccount.CanSetCustomName))]
 public static class FullAccount_CanSetCustomName
 {
-    // Prefix patch of FullAccount.CanSetCustomName to allow the usage of custom names
+    // Префикс-патч FullAccount.CanSetCustomName для разрешения использования кастомных имён
     public static void Prefix(ref bool canSetName)
     {
         if (CheatToggles.unlockFeatures)
@@ -225,7 +225,7 @@ public static class FullAccount_CanSetCustomName
 [HarmonyPatch(typeof(AccountManager), nameof(AccountManager.CanPlayOnline))]
 public static class AccountManager_CanPlayOnline
 {
-    // Prefix patch of AccountManager.CanPlayOnline to allow online games
+    // Постфикс-патч AccountManager.CanPlayOnline для разрешения онлайн-игр
     public static void Postfix(ref bool __result)
     {
         if (CheatToggles.unlockFeatures)
@@ -238,7 +238,7 @@ public static class AccountManager_CanPlayOnline
 [HarmonyPatch(typeof(InnerNetClient), nameof(InnerNetClient.JoinGame))]
 public static class InnerNetClient_JoinGame
 {
-    // Prefix patch of InnerNetClient.JoinGame to allow online games
+    // Префикс-патч InnerNetClient.JoinGame для разрешения онлайн-игр
     public static void Prefix()
     {
         if (CheatToggles.unlockFeatures)
@@ -251,7 +251,7 @@ public static class InnerNetClient_JoinGame
 [HarmonyPatch(typeof(GameManager), nameof(GameManager.CheckTaskCompletion))]
 public static class GameManager_CheckTaskCompletion
 {
-    // Prefix patch of GameManager.CheckTaskCompletion to prevent a running game from ending
+    // Префикс-патч GameManager.CheckTaskCompletion для предотвращения завершения текущей игры
     public static bool Prefix(ref bool __result)
     {
         if (!CheatToggles.noGameEnd) return true;
@@ -271,11 +271,11 @@ public static class Mushroom_FixedUpdate
     }
 }
 
-// Found here: https://github.com/g0aty/SickoMenu/blob/main/hooks/PlainDoor.cpp
+// Найдено здесь: https://github.com/g0aty/SickoMenu/blob/main/hooks/PlainDoor.cpp
 [HarmonyPatch(typeof(DoorBreakerGame), nameof(DoorBreakerGame.Start))]
 public static class DoorBreakerGame_Start
 {
-    // Prefix patch of DoorBreakerGame.Start to automatically open a door when the player interacts with it
+    // Префикс-патч DoorBreakerGame.Start для автоматического открытия двери при взаимодействии
     public static bool Prefix(DoorBreakerGame __instance)
     {
         if (!CheatToggles.autoOpenDoorsOnUse) return true;
@@ -288,11 +288,11 @@ public static class DoorBreakerGame_Start
     }
 }
 
-// Found here: https://github.com/g0aty/SickoMenu/blob/main/hooks/PlainDoor.cpp
+// Найдено здесь: https://github.com/g0aty/SickoMenu/blob/main/hooks/PlainDoor.cpp
 [HarmonyPatch(typeof(DoorCardSwipeGame), nameof(DoorCardSwipeGame.Begin))]
 public static class DoorCardSwipeGame_Begin
 {
-    // Prefix patch of DoorCardSwipeGame.Begin to automatically open a door when the player interacts with it
+    // Префикс-патч DoorCardSwipeGame.Begin для автоматического открытия двери при взаимодействии
     public static bool Prefix(DoorCardSwipeGame __instance)
     {
         if (!CheatToggles.autoOpenDoorsOnUse) return true;
@@ -305,11 +305,11 @@ public static class DoorCardSwipeGame_Begin
     }
 }
 
-// Found here: https://github.com/g0aty/SickoMenu/blob/main/hooks/PlainDoor.cpp
+// Найдено здесь: https://github.com/g0aty/SickoMenu/blob/main/hooks/PlainDoor.cpp
 [HarmonyPatch(typeof(MushroomDoorSabotageMinigame), nameof(MushroomDoorSabotageMinigame.Begin))]
 public static class MushroomDoorSabotageMinigame_Begin
 {
-    // Prefix patch of MushroomDoorSabotageMinigame.Begin to automatically open a door when the player interacts with it
+    // Префикс-патч MushroomDoorSabotageMinigame.Begin для автоматического открытия двери при взаимодействии
     public static bool Prefix(MushroomDoorSabotageMinigame __instance)
     {
         if (!CheatToggles.autoOpenDoorsOnUse) return true;
@@ -320,13 +320,13 @@ public static class MushroomDoorSabotageMinigame_Begin
     }
 }
 
-// NEEDS FIX : Blocks usage of consoles to which impostor
-// has access to (like those to fix sabotages) when cheat is disabled
+// НУЖНО ИСПРАВИТЬ : Блокирует использование консолей, к которым у предателя
+// есть доступ (например, для починки саботажа), когда чит отключён
 
 // [HarmonyPatch(typeof(Console), nameof(Console.CanUse))]
 // public static class Console_CanUse
 // {
-//     // Prefix patch of Console.CanUse to allow impostors to do tasks
+//     // Префикс-патч Console.CanUse, разрешающий предателям выполнять задачи
 //     public static void Prefix(Console __instance)
 //     {
 //         __instance.AllowImpostor = CheatToggles.impostorTasks;
@@ -336,20 +336,20 @@ public static class MushroomDoorSabotageMinigame_Begin
 [HarmonyPatch(typeof(IntroCutscene), "CoBegin")]
 public static class IntroCutscene_CoBegin
 {
-    // Prefix patch of IntroCutscene.CoBegin to force the LocalPlayer's role to a specified role
+    // Префикс-патч IntroCutscene.CoBegin для принудительной установки роли LocalPlayer
     public static void Prefix()
     {
         if (!Utils.isHost || !CheatToggles.forcedRole.HasValue) return;
 
         var forcedRole = CheatToggles.forcedRole.Value;
 
-        // If LocalPlayer already has the forced role, do nothing
+        // Если у LocalPlayer уже есть нужная роль — ничего не делаем
         if (PlayerControl.LocalPlayer.Data.RoleType == forcedRole)
         {
             return;
         }
 
-        // Find a player with the forced role to swap roles with
+        // Ищем игрока с нужной ролью, чтобы поменяться ролями
         PlayerControl roleSwapTarget = null;
         foreach (var player in PlayerControl.AllPlayerControls)
         {
@@ -367,27 +367,27 @@ public static class IntroCutscene_CoBegin
     }
 }
 
-// Found here: https://github.com/g0aty/SickoMenu/blob/main/hooks/LobbyBehaviour.cpp
+// Найдено здесь: https://github.com/g0aty/SickoMenu/blob/main/hooks/LobbyBehaviour.cpp
 [HarmonyPatch(typeof(GameContainer), nameof(GameContainer.SetupGameInfo))]
 public static class GameContainer_SetupGameInfo
 {
-    // Postfix patch of GameContainer.SetupGameInfo to show more information when finding a game:
-    // host name (e.g. Astral), lobby code (e.g. KLHCEG), host platform (e.g. Epic), and lobby age in minutes (e.g. 4:20)
+    // Постфикс-патч GameContainer.SetupGameInfo для отображения доп. информации при поиске игры:
+    // имя хоста (напр. Astral), код лобби (напр. KLHCEG), платформа хоста (напр. Epic), и возраст лобби в минутах (напр. 4:20)
     public static void Postfix(GameContainer __instance)
     {
         if (!CheatToggles.seeLobbyInfo) return;
 
-        // The Crewmate icon gets aligned properly with this
+        // Иконка члена экипажа правильно выравнивается с этим
         const string separator = "<#0000>000000000000000</color>";
 
         var trueHostName = __instance.gameListing.TrueHostName;
 
         var age = __instance.gameListing.Age;
-        var lobbyTime = $"Age: {age / 60}:{(age % 60 < 10 ? "0" : "")}{age % 60}";
+        var lobbyTime = $"Возраст: {age / 60}:{(age % 60 < 10 ? "0" : "")}{age % 60}";
 
         var platform = Utils.PlatformTypeToString(__instance.gameListing.Platform);
 
-        // Sets the text of the capacity field to include the new information
+        // Устанавливаем текст поля capacity, чтобы включить новую информацию
         __instance.capacity.text = $"<size=40%>{separator}\n{trueHostName}\n{__instance.capacity.text}\n" +
                                    $"<#fb0>{GameCode.IntToGameName(__instance.gameListing.GameId)}</color>\n" +
                                    $"<#b0f>{platform}</color>\n{lobbyTime}\n{separator}</size>";
@@ -397,7 +397,7 @@ public static class GameContainer_SetupGameInfo
 [HarmonyPatch(typeof(BanMenu), nameof(BanMenu.SetVisible))]
 public static class BanMenu_SetVisible
 {
-    // Prefix patch of BanMenu.SetVisible to always show kick and ban buttons as host
+    // Префикс-патч BanMenu.SetVisible, чтобы кнопки кика и бана всегда были видны хосту
     public static bool Prefix(BanMenu __instance, bool show)
     {
         if (!Utils.isHost) return true;
@@ -415,7 +415,7 @@ public static class BanMenu_SetVisible
 [HarmonyPatch(typeof(IGameOptionsExtensions), nameof(IGameOptionsExtensions.GetAdjustedNumImpostors))]
 public static class IGameOptionsExtensions_GetAdjustedNumImpostors
 {
-    // Prefix patch of IGameOptionsExtensions.GetAdjustedNumImpostors to remove impostor limits
+    // Префикс-патч IGameOptionsExtensions.GetAdjustedNumImpostors для снятия лимитов на число предателей
     public static bool Prefix(ref int __result)
     {
         if (!CheatToggles.noOptionsLimits) return true;
@@ -429,7 +429,7 @@ public static class IGameOptionsExtensions_GetAdjustedNumImpostors
 [HarmonyPatch(typeof(MatchInfoHudButton), nameof(MatchInfoHudButton.Update))]
 public static class MatchInfoHudButton_Update
 {
-    // Prefix patch of MatchInfoHudButton.Update to prevent the MatchInfo and Chat buttons from overlapping
+    // Префикс-патч MatchInfoHudButton.Update для предотвращения наложения кнопок MatchInfo и Chat
     public static bool Prefix(MatchInfoHudButton __instance)
     {
         if (CheatToggles.enableChat)
@@ -446,7 +446,7 @@ public static class MatchInfoHudButton_Update
 [HarmonyPatch(typeof(PlayerPurchasesData), nameof(PlayerPurchasesData.GetPurchase))]
 public static class PlayerPurchasesData_GetPurchase
 {
-    // Postfix patch of PlayerPurchasesData.GetPurchase to unlock all cosmetics
+    // Постфикс-патч PlayerPurchasesData.GetPurchase для разблокировки всей косметики
     public static void Postfix(ref bool __result)
     {
         if (!CheatToggles.freeCosmetics) return;
@@ -469,16 +469,16 @@ public static class PassiveUiElement_Patches
     [HarmonyPatch(typeof(Scrollbar), nameof(Scrollbar.ReceiveClickDrag))]
     [HarmonyPatch(typeof(Scroller), nameof(Scroller.UpdateScrollBars))]
 
-    // Prefix patch for all classes that inherit from PassiveUiElement to prevent clicks from going through Malum's UI
+    // Префикс-патч для всех классов, наследующих PassiveUiElement, чтобы клики не проходили сквозь UI Malum
     public static bool Prefix()
     {
         if (MalumMenu.menuAllowClickThrough.Value) return true;
 
-        // Input.mousePosition has a bottom-left origin
-        // Convert it to a top-left origin by flipping the Y coordinate
+        // Input.mousePosition имеет origin в левом нижнем углу
+        // Конвертируем в origin в левом верхнем углу, инвертируя Y-координату
         Vector2 mousePosition = new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y);
 
-        // Rect.Contains() uses GUI coordinates (top-left origin)
+        // Rect.Contains() использует GUI-координаты (origin в левом верхнем углу)
         return !((MenuUI.isGUIActive && MenuUI.windowRect.Contains(mousePosition)) ||
                  (CheatToggles.showConsole && ConsoleUI.windowRect.Contains(mousePosition)) ||
                  (CheatToggles.showDoorsMenu && DoorsUI.windowRect.Contains(mousePosition)) ||
