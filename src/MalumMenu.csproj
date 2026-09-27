@@ -1,27 +1,33 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
-        <LangVersion>latest</LangVersion>
-        <DebugType>embedded</DebugType>
+        <TargetFramework>net6.0</TargetFramework>          <!-- Целевая платформа: .NET 6.0 -->
+        <LangVersion>latest</LangVersion>                   <!-- Версия языка C#: последняя -->
+        <DebugType>embedded</DebugType>                     <!-- Тип отладочной информации: встроенная -->
 
-        <VersionPrefix>3.3.0</VersionPrefix>
-        <Description>all play and no cheats makes among us a dull game</Description>
-        <Authors>scp222thj, astra1dev</Authors>
+        <VersionPrefix>3.3.0</VersionPrefix>                <!-- Префикс версии: 3.3.0 -->
+        <Description>all play and no cheats makes among us a dull game</Description>  <!-- Описание: «одна игра без читов делает Among Us скучной игрой» (отсылка к поговорке «all work and no play makes Jack a dull boy») -->
+        <Authors>scp222thj, astra1dev</Authors>             <!-- Авторы: scp222thj, astra1dev -->
     </PropertyGroup>
 
     <!--<ItemGroup>
-        <EmbeddedResource Include=".\Assets\**" />
+        <EmbeddedResource Include=".\Assets\**" />           Встроенный ресурс: включить всё из .\Assets\** (закомментировано)
     </ItemGroup>-->
 
     <ItemGroup>
+        <!-- Ссылка на пакет BepInEx.Unity.IL2CPP версии 6.0.0-be.735, Private=false, исключить ресурсы: runtime;native -->
         <PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.735" Private="false" ExcludeAssets="runtime;native" />
+        <!-- Ссылка на пакет AmongUs.GameLibs.Steam версии 2026.8.18, PrivateAssets=all -->
         <PackageReference Include="AmongUs.GameLibs.Steam" Version="2026.8.18" PrivateAssets="all" />
 
+        <!-- Ссылка на пакет BepInEx.AutoPlugin версии 1.1.0, PrivateAssets=all -->
         <PackageReference Include="BepInEx.AutoPlugin" Version="1.1.0" PrivateAssets="all" />
+        <!-- Ссылка на пакет BepInEx.IL2CPP.MSBuild версии 2.1.0-rc.1, PrivateAssets=all, ExcludeAssets=runtime -->
         <PackageReference Include="BepInEx.IL2CPP.MSBuild" Version="2.1.0-rc.1" PrivateAssets="all" ExcludeAssets="runtime" />
     </ItemGroup>
 
+    <!-- Цель "Copy", выполняется после сборки, при условии что переменная $(AmongUs) не пуста -->
     <Target Name="Copy" AfterTargets="Build" Condition="'$(AmongUs)' != ''">
+        <!-- Копировать исходные файлы: $(TargetPath) в папку $(AmongUs)/BepInEx/plugins/, использовать симлинки если возможно -->
         <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(AmongUs)/BepInEx/plugins/" UseSymboliclinksIfPossible="true" />
     </Target>
 </Project>
