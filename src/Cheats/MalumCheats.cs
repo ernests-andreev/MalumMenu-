@@ -14,14 +14,14 @@ public static class MalumCheats
     {
         if (!CheatToggles.closeMeeting) return;
 
-        if (Utils.isMeeting) // Closes MeetingHud window if it's open
+        if (Utils.isMeeting) // Закрывает окно MeetingHud, если оно открыто
         {
 
-            // Destroy MeetingHud window gameobject
+            // Уничтожаем GameObject окна MeetingHud
             MeetingHud.Instance.DespawnOnDestroy = false;
             Object.Destroy(MeetingHud.Instance.gameObject);
 
-            // Gameplay must be reenabled
+            // Геймплей должен быть перезапущен
             DestroyableSingleton<HudManager>.Instance.StartCoroutine(DestroyableSingleton<HudManager>.Instance.CoFadeFullScreen(Color.black, Color.clear, 0.2f, false));
             PlayerControl.LocalPlayer.SetKillTimer(GameManager.Instance.LogicOptions.GetKillCooldown());
             ShipStatus.Instance.EmergencyCooldown = GameManager.Instance.LogicOptions.GetEmergencyCooldown();
@@ -31,7 +31,7 @@ public static class MalumCheats
             ControllerManager.Instance.CloseAndResetAll();
 
         }
-        else if (ExileController.Instance) // Ends exile cutscene if it's playing
+        else if (ExileController.Instance) // Завершает катсцену изгнания, если она проигрывается
         {
             ExileController.Instance.ReEnableGameplay();
             ExileController.Instance.WrapUp();
@@ -58,7 +58,7 @@ public static class MalumCheats
 
         if (Utils.isHost)
         {
-            // Same as PlayerControl.ReportDeadBody but without additional checks
+            // То же, что PlayerControl.ReportDeadBody, но без дополнительных проверок
             MeetingRoomManager.Instance.AssignSelf(PlayerControl.LocalPlayer, null);
             DestroyableSingleton<HudManager>.Instance.OpenMeetingRoom(PlayerControl.LocalPlayer);
             PlayerControl.LocalPlayer.RpcStartMeeting(null);
@@ -112,12 +112,12 @@ public static class MalumCheats
     {
         if (CheatToggles.endlessVentTime)
         {
-            // Makes vent time incredibly long (float.MaxValue) so that it never ends
+            // Делает время в вентиляции невероятно большим (float.MaxValue), чтобы оно никогда не заканчивалось
             engineerRole.inVentTimeRemaining = float.MaxValue;
         }
         else if (engineerRole.inVentTimeRemaining > engineerRole.GetCooldown())
         {
-            // Vent time is reset to normal value after the cheat is disabled
+            // Время в вентиляции сбрасывается к нормальному значению после отключения чита
             engineerRole.inVentTimeRemaining = engineerRole.GetCooldown();
         }
 
@@ -137,12 +137,12 @@ public static class MalumCheats
     {
         if (CheatToggles.endlessSsDuration)
         {
-            // Makes shapeshift duration so incredibly long (float.MaxValue) so that it never ends
+            // Делает длительность превращения невероятно большой (float.MaxValue), чтобы оно никогда не заканчивалось
             shapeshifterRole.durationSecondsRemaining = float.MaxValue;
         }
         else if (shapeshifterRole.durationSecondsRemaining > GameManager.Instance.LogicOptions.GetRoleFloat(FloatOptionNames.ShapeshifterDuration))
         {
-            // Shapeshift duration is reset to normal value after the cheat is disabled
+            // Длительность превращения сбрасывается к нормальному значению после отключения чита
             shapeshifterRole.durationSecondsRemaining = GameManager.Instance.LogicOptions.GetRoleFloat(FloatOptionNames.ShapeshifterDuration);
 
         }
@@ -157,12 +157,12 @@ public static class MalumCheats
 
         if (CheatToggles.endlessBattery)
         {
-            // Makes vitals battery so incredibly long (float.MaxValue) so that it never ends
+            // Делает батарею виталов невероятно большой (float.MaxValue), чтобы она никогда не заканчивалась
             scientistRole.currentCharge = float.MaxValue;
         }
         else if (scientistRole.currentCharge > scientistRole.RoleCooldownValue)
         {
-            // Battery charge is reset to normal value after the cheat is disabled
+            // Заряд батареи сбрасывается к нормальному значению после отключения чита
             scientistRole.currentCharge = scientistRole.RoleCooldownValue;
         }
     }
@@ -185,24 +185,24 @@ public static class MalumCheats
 
         if (CheatToggles.endlessTracking)
         {
-            // Makes vitals battery so incredibly long (float.MaxValue) so that it never ends
+            // Делает длительность отслеживания невероятно большой (float.MaxValue), чтобы она никогда не заканчивалась
             trackerRole.durationSecondsRemaining = float.MaxValue;
         }
         else if (trackerRole.durationSecondsRemaining > GameManager.Instance.LogicOptions.GetRoleFloat(FloatOptionNames.TrackerDuration))
         {
-            // Battery charge is reset to normal value after the cheat is disabled
+            // Длительность отслеживания сбрасывается к нормальному значению после отключения чита
             trackerRole.durationSecondsRemaining = GameManager.Instance.LogicOptions.GetRoleFloat(FloatOptionNames.TrackerDuration);
         }
     }
 
     public static void UseVentCheat(HudManager hudManager)
     {
-        // try-catch to prevent errors when role is null
+        // try-catch для предотвращения ошибок, когда роль null
         try
         {
 
-			// Engineers & Impostors don't need this cheat so it is disabled for them
-			// Ghost venting causes issues so it is also disabled
+			// Инженерам и предателям этот чит не нужен, поэтому для них он отключается
+			// Призрачная вентиляция вызывает проблемы, поэтому она тоже отключена
 
 			if (!PlayerControl.LocalPlayer.Data.Role.CanVent && !PlayerControl.LocalPlayer.Data.IsDead)
             {
@@ -242,11 +242,11 @@ public static class MalumCheats
 
         if (Utils.isLobby)
         {
-            HudManager.Instance.Notifier.AddDisconnectMessage("Killing in lobby disabled for being too buggy");
+            HudManager.Instance.Notifier.AddDisconnectMessage("Убийство в лобби отключено — слишком много багов");
         }
         else
         {
-            // Kill all players by sending a successful MurderPlayer RPC call
+            // Убиваем всех игроков, отправляя успешный MurderPlayer RPC-вызов
             foreach (var player in PlayerControl.AllPlayerControls)
             {
                 Utils.MurderPlayer(player, MurderResultFlags.Succeeded);
@@ -262,11 +262,11 @@ public static class MalumCheats
 
         if (Utils.isLobby)
         {
-            HudManager.Instance.Notifier.AddDisconnectMessage("Killing in lobby disabled for being too buggy");
+            HudManager.Instance.Notifier.AddDisconnectMessage("Убийство в лобби отключено — слишком много багов");
         }
         else
         {
-            // Kill all players by sending a successful MurderPlayer RPC call
+            // Убиваем всех членов экипажа, отправляя успешный MurderPlayer RPC-вызов
             foreach (var player in PlayerControl.AllPlayerControls)
             {
                 if (player.Data.Role.TeamType == RoleTeamTypes.Crewmate)
@@ -285,11 +285,11 @@ public static class MalumCheats
 
         if (Utils.isLobby)
         {
-            HudManager.Instance.Notifier.AddDisconnectMessage("Killing in lobby disabled for being too buggy");
+            HudManager.Instance.Notifier.AddDisconnectMessage("Убийство в лобби отключено — слишком много багов");
         }
         else
         {
-            // Kill all players by sending a successful MurderPlayer RPC call
+            // Убиваем всех предателей, отправляя успешный MurderPlayer RPC-вызов
             foreach (var player in PlayerControl.AllPlayerControls)
             {
                 if (player.Data.Role.TeamType == RoleTeamTypes.Impostor)
@@ -308,7 +308,7 @@ public static class MalumCheats
 
         foreach (var player in ProtectUI.playersToProtect)
         {
-            if (player.protectedByGuardianId == -1) // -1 means no protection is currently active
+            if (player.protectedByGuardianId == -1) // -1 означает, что защита сейчас не активна
             {
                 //PlayerControl.LocalPlayer.TurnOnProtection(true, PlayerControl.LocalPlayer.cosmetics.ColorId, PlayerControl.LocalPlayer.PlayerId);
                 PlayerControl.LocalPlayer.RpcProtectPlayer(player, PlayerControl.LocalPlayer.cosmetics.ColorId);
@@ -321,7 +321,7 @@ public static class MalumCheats
         if (PlayerControl.LocalPlayer?.NetTransform == null || Camera.main == null) return;
         if (!CheatToggles.teleportCursor) return;
 
-        // Teleport player to cursor's in-world position on right-click
+        // Телепортирует игрока в мировую позицию курсора по правому клику
         if (Input.GetMouseButtonDown(1))
         {
             PlayerControl.LocalPlayer.NetTransform.RpcSnapTo(Camera.main.ScreenToWorldPoint(Input.mousePosition));
@@ -356,7 +356,7 @@ public static class MalumCheats
     {
         if (CheatToggles.animPet && Utils.isPlayer && PlayerControl.LocalPlayer.cosmetics != null && PlayerControl.LocalPlayer.cosmetics.CurrentPet != null)
         {
-            // Don't move LocalPlayer, just send the RPC so others see the petting animation
+            // Не двигаем LocalPlayer, просто отправляем RPC, чтобы другие видели анимацию поглаживания
             RpcPetMessage rpcMessage = new(PlayerControl.LocalPlayer.MyPhysics.NetId,
                 PlayerControl.LocalPlayer.cosmetics.CurrentPet.PettingPlayerPosition,
                 PlayerControl.LocalPlayer.cosmetics.CurrentPet.transform.position);
@@ -410,7 +410,7 @@ public static class MalumCheats
             }
             else if (!CheatToggles.animCamsInUse && _isCamsAnimActive)
             {
-                // Turn off cams if the cheat was used before and is now disabled
+                // Выключаем камеры, если чит использовался раньше и теперь отключён
                 ShipStatus.Instance.RpcUpdateSystem(SystemTypes.Security, 0);
                 _isCamsAnimActive = false;
             }
@@ -429,8 +429,8 @@ public static class MalumCheats
         CheatToggles.animMedScan = false;
         CheatToggles.animCamsInUse = false;
 
-        // This ensures cams and scan animations don't remain marked as active if the player
-        // disconnects while the toggles are on (as this may cause unusual RPCs in lobbies)
+        // Это гарантирует, что анимации камер и сканирования не останутся отмеченными как активные,
+        // если игрок отключится, пока переключатели включены (так как это может вызвать необычные RPC в лобби)
 
         _isCamsAnimActive = false;
         _isScanAnimActive = false;
