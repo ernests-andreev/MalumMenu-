@@ -4,40 +4,40 @@ namespace MalumMenu;
 
 public class AnimationsTab : ITab
 {
-    public string name => "Animations";
+    public string name => "Анимации";        // Название вкладки
 
     public void Draw()
     {
         GUILayout.BeginVertical(GUILayout.Width(MenuUI.windowWidth * 0.425f));
 
-        DrawGeneral();
+        DrawGeneral();          // Основные
 
         GUILayout.Space(15);
 
-        DrawClientSided();
+        DrawClientSided();      // Клиентские
 
         GUILayout.EndVertical();
     }
 
     private void DrawGeneral()
     {
-        CheatToggles.animShields = GUILayout.Toggle(CheatToggles.animShields, " Shields");
+        CheatToggles.animShields = GUILayout.Toggle(CheatToggles.animShields, " Щиты");
 
-        CheatToggles.animAsteroids = GUILayout.Toggle(CheatToggles.animAsteroids, " Asteroids");
+        CheatToggles.animAsteroids = GUILayout.Toggle(CheatToggles.animAsteroids, " Астероиды");
 
-        CheatToggles.animEmptyGarbage = GUILayout.Toggle(CheatToggles.animEmptyGarbage, " Empty Garbage");
+        CheatToggles.animEmptyGarbage = GUILayout.Toggle(CheatToggles.animEmptyGarbage, " Выброс мусора");
 
-        CheatToggles.animMedScan = GUILayout.Toggle(CheatToggles.animMedScan, " Medbay Scan");
+        CheatToggles.animMedScan = GUILayout.Toggle(CheatToggles.animMedScan, " Сканирование в медотсеке");
 
-        CheatToggles.animCamsInUse = GUILayout.Toggle(CheatToggles.animCamsInUse, " Cams In Use");
+        CheatToggles.animCamsInUse = GUILayout.Toggle(CheatToggles.animCamsInUse, " Камеры используются");
 
-        // CheatToggles.animPet = GUILayout.Toggle(CheatToggles.animPet, " Pet");
+        // CheatToggles.animPet = GUILayout.Toggle(CheatToggles.animPet, " Питомец");
     }
 
     private void DrawClientSided()
     {
-        GUILayout.Label("Client-Sided", GUIStylePreset.TabSubtitle);
+        GUILayout.Label("Клиентские", GUIStylePreset.TabSubtitle);    // Подзаголовок: "Клиентские"
 
-        CheatToggles.moonWalk = GUILayout.Toggle(CheatToggles.moonWalk, " Moonwalk");
+        CheatToggles.moonWalk = GUILayout.Toggle(CheatToggles.moonWalk, " Лунная походка");
     }
 }
