@@ -6,29 +6,29 @@ namespace MalumMenu;
 
 public class OverloadUI : MonoBehaviour
 {
-    public static int numSuccesses;
-    public static int maxPossibleTargets;
-    public static int killSwitchThreshold;
-    public static HashSet<NetworkedPlayerInfo> currentTargets = new HashSet<NetworkedPlayerInfo>(new NetPlayerInfoCidComparer());
-    private HashSet<NetworkedPlayerInfo> _tmpTargets = new HashSet<NetworkedPlayerInfo>(new NetPlayerInfoCidComparer());
-    private bool _areTargetsUnlocked => !CheatToggles.runOverload || !CheatToggles.olLockTargets;
-    private bool _hasAutoStarted;
+    public static int numSuccesses;                                                  // Число успешных киков
+    public static int maxPossibleTargets;                                            // Максимум возможных целей
+    public static int killSwitchThreshold;                                           // Порог срабатывания kill switch
+    public static HashSet<NetworkedPlayerInfo> currentTargets = new HashSet<NetworkedPlayerInfo>(new NetPlayerInfoCidComparer());  // Текущие цели
+    private HashSet<NetworkedPlayerInfo> _tmpTargets = new HashSet<NetworkedPlayerInfo>(new NetPlayerInfoCidComparer());          // Временный список целей
+    private bool _areTargetsUnlocked => !CheatToggles.runOverload || !CheatToggles.olLockTargets;   // Можно ли менять цели
+    private bool _hasAutoStarted;                                                    // Был ли автозапуск
 
-    public static Rect windowRect = new(320, 10, 595, 500);
-    private GUIStyle _targetButtonStyle;
-    private GUIStyle _normalButtonStyle;
-    private GUIStyle _logStyle;
+    public static Rect windowRect = new(320, 10, 595, 500);                          // Прямоугольник окна
+    private GUIStyle _targetButtonStyle;                                             // Стиль кнопки-цели
+    private GUIStyle _normalButtonStyle;                                             // Обычный стиль кнопки
+    private GUIStyle _logStyle;                                                      // Стиль лога
 
-    // Overload Console elements
-    private static Vector2 _scrollPosition = Vector2.zero;
-    private static List<string> _logEntries = new();
-    private const int MaxLogEntries = 300;
+    // Элементы консоли Overload
+    private static Vector2 _scrollPosition = Vector2.zero;                           // Позиция прокрутки лога
+    private static List<string> _logEntries = new();                                 // Записи лога
+    private const int MaxLogEntries = 300;                                           // Максимум записей в логе
 
     private void Start()
     {
-        killSwitchThreshold = 500 * MalumMenu.killSwitchLvl.Value;
+        killSwitchThreshold = 500 * MalumMenu.killSwitchLvl.Value;                   // Порог пинга для kill switch
 
-        if (!CheatToggles.olAutoAdapt)
+        if (!CheatToggles.olAutoAdapt)      // Если не включена автоадаптация — ставим значения по умолчанию
         {
             OverloadHandler.strength = MalumMenu.defaultStrength.Value;
             OverloadHandler.cooldown = MalumMenu.defaultCooldown.Value;
@@ -55,18 +55,20 @@ public class OverloadUI : MonoBehaviour
                     {
                         _tmpTargets.Add(playerData);
 
+                        // Лог добавления цели
                         if (CheatToggles.runOverload && CheatToggles.olLogAddRemove && !currentTargets.Contains(playerData))
                         {
                             string colorStr = ColorUtility.ToHtmlStringRGB(Color.blue);
-                            LogConsole($"> <b><color=#{colorStr}>ADD : {playerData.DefaultOutfit.PlayerName} (ID : {playerData.ClientId})</color></b>");
+                            LogConsole($"> <b><color=#{colorStr}>ДОБАВЛЕН : {playerData.DefaultOutfit.PlayerName} (ID : {playerData.ClientId})</color></b>");
                         }
                     }
                     else
                     {
+                        // Лог удаления цели
                         if (CheatToggles.runOverload && CheatToggles.olLogAddRemove && currentTargets.Contains(playerData))
                         {
                             string colorStr = ColorUtility.ToHtmlStringRGB(Color.blue);
-                            LogConsole($"> <b><color=#{colorStr}>REMOVE : {playerData.DefaultOutfit.PlayerName} (ID : {playerData.ClientId})</color></b>");
+                            LogConsole($"> <b><color=#{colorStr}>УДАЛЁН : {playerData.DefaultOutfit.PlayerName} (ID : {playerData.ClientId})</color></b>");
                         }
                     }
                 }
@@ -80,9 +82,9 @@ public class OverloadUI : MonoBehaviour
             }
         }
 
-        // The HashSet swap (currentTargets <-> _tmpTargets) can only be done if isPlayer
-        // Otherwise currentTargets gets cleared too early in endgame / disconnect with overload on,
-        // causing the STOP message to log the wrong total count
+        // Обмен HashSet (currentTargets <-> _tmpTargets) можно делать только если isPlayer
+        // Иначе currentTargets очищается слишком рано в конце игры / при отключении с включённым overload,
+        // из-за чего сообщение STOP логирует неправильное общее число
 
         if (Utils.isPlayer)
         {
@@ -92,7 +94,7 @@ public class OverloadUI : MonoBehaviour
         }
         else
         {
-            // Targets are cleared here if STOP log is done / unneeded (overload off)
+            // Цели очищаются здесь, если STOP-лог сделан / не нужен (overload выключен)
 
             if (!CheatToggles.runOverload)
             {
@@ -105,7 +107,7 @@ public class OverloadUI : MonoBehaviour
 
         _tmpTargets.Clear();
 
-        if (CheatToggles.olAutoAdapt)
+        if (CheatToggles.olAutoAdapt)         // Автоадаптация параметров
         {
             var adaptedValues = OverloadHandler.CalculateAdaptedValues();
 
@@ -117,19 +119,20 @@ public class OverloadUI : MonoBehaviour
 
         if (CheatToggles.runOverload)
         {
-            bool doAutoStop = CheatToggles.olAutoStop && numCurrentTargets <= 0;
+            bool doAutoStop = CheatToggles.olAutoStop && numCurrentTargets <= 0;      // Автостоп, если целей нет
 
-            bool isLagging = Utils.GetPing() > killSwitchThreshold;
-            bool doKillSwitch = CheatToggles.olKillSwitch && isLagging;
+            bool isLagging = Utils.GetPing() > killSwitchThreshold;                  // Лагает ли
+            bool doKillSwitch = CheatToggles.olKillSwitch && isLagging;              // Сработал ли kill switch
 
             if (doAutoStop || doKillSwitch)
             {
-                string extraStr = doKillSwitch ? " : ! Kill Switch !" : "";
+                string extraStr = doKillSwitch ? " : ! Kill Switch !" : "";          // Пометка о kill switch
                 StopOverload(extraStr);
             }
         }
         else
         {
+            // Автозапуск overload при появлении целей
             if (Utils.isPlayer && CheatToggles.olAutoStart && !_hasAutoStarted && numCurrentTargets > 0)
             {
                 _hasAutoStarted = true;
@@ -146,7 +149,7 @@ public class OverloadUI : MonoBehaviour
 
         UIHelpers.ApplyUIColor();
 
-        windowRect = GUI.Window((int)WindowId.OverloadUI, windowRect, (GUI.WindowFunction)OverloadWindow, "Overload");
+        windowRect = GUI.Window((int)WindowId.OverloadUI, windowRect, (GUI.WindowFunction)OverloadWindow, "Перегрузка");  // Заголовок окна: "Перегрузка"
     }
 
     private void OverloadWindow(int windowID)
@@ -170,7 +173,7 @@ public class OverloadUI : MonoBehaviour
 
             GUILayout.BeginHorizontal(GUILayout.ExpandWidth(false));
 
-            DrawPlayers(players, playerCount);
+            DrawPlayers(players, playerCount);      // Рисуем список игроков-целей
 
             GUILayout.EndHorizontal();
 
@@ -181,9 +184,9 @@ public class OverloadUI : MonoBehaviour
 
         GUILayout.BeginVertical();
 
-        DrawSelectionToggles();
+        DrawSelectionToggles();                     // Рисуем переключатели фильтров
 
-        if (CheatToggles.overloadReset)
+        if (CheatToggles.overloadReset)             // Сброс всех фильтров и кастомных целей
         {
             CheatToggles.overloadAll = false;
             CheatToggles.overloadHost = false;
@@ -203,17 +206,17 @@ public class OverloadUI : MonoBehaviour
 
         GUILayout.Space(10f);
 
-        GUILayout.Box("", GUIStylePreset.DarkSeparator, GUILayout.Height(1f), GUILayout.Width(420f));
+        GUILayout.Box("", GUIStylePreset.DarkSeparator, GUILayout.Height(1f), GUILayout.Width(420f));   // Разделитель
 
         GUILayout.Space(10f);
 
         GUILayout.BeginHorizontal();
 
-        DrawStateButtons();
+        DrawStateButtons();                         // Кнопки START / STOP
 
         GUILayout.Space(3f);
 
-        DrawStateLabel();
+        DrawStateLabel();                           // Метка состояния (On / Off)
 
         GUILayout.EndHorizontal();
 
@@ -221,7 +224,7 @@ public class OverloadUI : MonoBehaviour
 
         GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(539f));
 
-        DrawConsole();
+        DrawConsole();                              // Консоль лога
 
         GUILayout.EndVertical();
 
@@ -238,7 +241,7 @@ public class OverloadUI : MonoBehaviour
         {
             _targetButtonStyle = new GUIStyle(GUI.skin.button)
             {
-                fontStyle = FontStyle.Italic
+                fontStyle = FontStyle.Italic             // Курсив для кнопок-целей
             };
         }
 
@@ -246,7 +249,7 @@ public class OverloadUI : MonoBehaviour
         {
             _normalButtonStyle = new GUIStyle(GUI.skin.button)
             {
-                fontStyle = FontStyle.Bold
+                fontStyle = FontStyle.Bold               // Жирный для обычных кнопок
             };
         }
 
@@ -261,32 +264,32 @@ public class OverloadUI : MonoBehaviour
 
     public static void LogConsole(string message)
     {
-        if (_logEntries.Count >= MaxLogEntries)
+        if (_logEntries.Count >= MaxLogEntries)          // Ограничиваем размер лога
         {
             _logEntries.RemoveAt(0);
         }
 
         _logEntries.Add(message);
 
-        _scrollPosition.y = float.MaxValue;
+        _scrollPosition.y = float.MaxValue;              // Автопрокрутка вниз
     }
 
     public static void StartOverload()
     {
         CheatToggles.runOverload = true;
 
-        if (CheatToggles.olAutoClear)
+        if (CheatToggles.olAutoClear)                    // Автоочистка лога
         {
             _logEntries.Clear();
         }
 
-        if (CheatToggles.olLogStartStop)
+        if (CheatToggles.olLogStartStop)                 // Лог START
         {
             string colorStr = ColorUtility.ToHtmlStringRGB(Color.red);
             string pluralStr = currentTargets.Count != 1 ? "s" : "";
-            string allStr = maxPossibleTargets > 0 && currentTargets.Count == maxPossibleTargets ? " - ALL" : "";
+            string allStr = maxPossibleTargets > 0 && currentTargets.Count == maxPossibleTargets ? " - ВСЕ" : "";
 
-            LogConsole($"> <b><color=#{colorStr}>START : [{currentTargets.Count}] Target{pluralStr}{allStr}</color></b>");
+            LogConsole($"> <b><color=#{colorStr}>СТАРТ : [{currentTargets.Count}] Цел{pluralStr}{allStr}</color></b>");
         }
 
         numSuccesses = 0;
@@ -294,16 +297,16 @@ public class OverloadUI : MonoBehaviour
 
     public static void StopOverload(string extraStr = "")
     {
-        if (CheatToggles.olLogStartStop)
+        if (CheatToggles.olLogStartStop)                 // Лог STOP
         {
             int total = currentTargets.Count+numSuccesses;
             string colorStr = ColorUtility.ToHtmlStringRGB(Color.red);
-            LogConsole($"> <b><color=#{colorStr}>STOP : [{numSuccesses} / {total}] Kicked{extraStr}</color></b>");
+            LogConsole($"> <b><color=#{colorStr}>СТОП : [{numSuccesses} / {total}] Кикнуто{extraStr}</color></b>");
         }
 
-        // runOverload must be toggled off after STOP message has been logged
-        // Otherwise currentTargets gets cleared too early during disconnect with overload on,
-        // causing the STOP message to log the wrong total count
+        // runOverload должен выключаться после логирования STOP-сообщения
+        // Иначе currentTargets очищается слишком рано при отключении с включённым overload,
+        // из-за чего STOP-сообщение логирует неправильное общее число
 
         CheatToggles.runOverload = false;
 
@@ -338,9 +341,9 @@ public class OverloadUI : MonoBehaviour
             {
                 if (isTarget)
                 {
-                    // If the target being removed was enabled by a filter, that filter is disabled as well
-                    // Any other targets added by the same filter are re-added as custom targets so only
-                    // the intended target is removed
+                    // Если удаляемая цель была добавлена фильтром, этот фильтр тоже отключается
+                    // Остальные цели, добавленные тем же фильтром, пере-добавляются как кастомные цели,
+                    // чтобы удалить только нужную цель
 
                     HashSet<OverloadHandler.TargetType> targetTypes = playerTarget.targetTypes;
 
@@ -375,11 +378,11 @@ public class OverloadUI : MonoBehaviour
                 }
             }
 
-            // Reset UI color
+            // Сброс цветов UI
             GUI.backgroundColor = standardBackgroundColor;
             GUI.contentColor = standardContentColor;
 
-            // UI shows rows of 3 buttons (1 button per player)
+            // UI показывает строки по 3 кнопки (по 1 кнопке на игрока)
             if (num % 3 == 0 && num < playerCount)
             {
                 GUILayout.EndHorizontal();
@@ -390,19 +393,19 @@ public class OverloadUI : MonoBehaviour
 
     private void DrawSelectionToggles()
     {
-        bool newOverloadAll = GUILayout.Toggle(CheatToggles.overloadAll, " All");
+        bool newOverloadAll = GUILayout.Toggle(CheatToggles.overloadAll, " Все");
         CheatToggles.overloadAll = _areTargetsUnlocked ? newOverloadAll : false;
 
-        bool newOverloadHost = GUILayout.Toggle(CheatToggles.overloadHost, " Host");
+        bool newOverloadHost = GUILayout.Toggle(CheatToggles.overloadHost, " Хост");
         CheatToggles.overloadHost = _areTargetsUnlocked ? newOverloadHost : false;
 
-        bool newOverloadCrew = GUILayout.Toggle(CheatToggles.overloadCrew, " Crewmates");
+        bool newOverloadCrew = GUILayout.Toggle(CheatToggles.overloadCrew, " Члены экипажа");
         CheatToggles.overloadCrew = _areTargetsUnlocked ? newOverloadCrew : false;
 
-        bool newOverloadImps = GUILayout.Toggle(CheatToggles.overloadImps, " Impostors");
+        bool newOverloadImps = GUILayout.Toggle(CheatToggles.overloadImps, " Предатели");
         CheatToggles.overloadImps = _areTargetsUnlocked ? newOverloadImps : false;
 
-        bool newOverloadReset = GUILayout.Toggle(CheatToggles.overloadReset, " Reset");
+        bool newOverloadReset = GUILayout.Toggle(CheatToggles.overloadReset, " Сброс");
         CheatToggles.overloadReset = _areTargetsUnlocked ? newOverloadReset : false;
     }
 
@@ -415,26 +418,26 @@ public class OverloadUI : MonoBehaviour
         Color startBackgroundColor = Color.green;
         GUI.backgroundColor = startEnabled ? startBackgroundColor : Color.black;
 
-        if (GUILayout.Button("START", GUILayout.Width(140f)) && startEnabled)
+        if (GUILayout.Button("СТАРТ", GUILayout.Width(140f)) && startEnabled)
         {
             StartOverload();
         }
 
-        // Reset UI color
+        // Сброс цветов UI
         GUI.backgroundColor = standardBackgroundColor;
 
-        // Utils.isPlayer check is unnecessary as MenuUI check already enforces it for runOverload
+        // Проверка Utils.isPlayer не нужна, так как проверка MenuUI уже обеспечивает её для runOverload
         bool stopEnabled = CheatToggles.runOverload;
 
         Color stopBackgroundColor = Color.red;
         GUI.backgroundColor = stopEnabled ? stopBackgroundColor : Color.black;
 
-        if (GUILayout.Button("STOP", GUILayout.Width(140f)) && stopEnabled)
+        if (GUILayout.Button("СТОП", GUILayout.Width(140f)) && stopEnabled)
         {
             StopOverload();
         }
 
-        // Reset UI color
+        // Сброс цветов UI
         GUI.backgroundColor = standardBackgroundColor;
     }
 
@@ -445,18 +448,18 @@ public class OverloadUI : MonoBehaviour
             Color onColor = Color.Lerp(Palette.AcceptedGreen, Color.white, 0.5f);
             string colorStr = ColorUtility.ToHtmlStringRGB(onColor);
 
-            string firstStr = $"<b><color=#{colorStr}> On : ";
+            string firstStr = $"<b><color=#{colorStr}> Вкл : ";
             string middleStr;
             string finalStr = "</color></b>";
 
             if (currentTargets.Count > 0)
             {
                 string pluralStr = currentTargets.Count != 1 ? "s" : "";
-                middleStr = $"Attacking {currentTargets.Count} target{pluralStr}";
+                middleStr = $"Атака {currentTargets.Count} цел{pluralStr}";
             }
             else
             {
-                middleStr = "Idle";
+                middleStr = "Простой";
             }
 
             GUILayout.Label($"{firstStr}{middleStr}{finalStr}");
@@ -470,10 +473,10 @@ public class OverloadUI : MonoBehaviour
             if (currentTargets.Count > 0)
             {
                 string pluralStr = currentTargets.Count != 1 ? "s" : "";
-                middleStr = $" : {currentTargets.Count} target{pluralStr} selected";
+                middleStr = $" : выбрано {currentTargets.Count} цел{pluralStr}";
             }
 
-            GUILayout.Label($"<b><color=#{colorStr}> Off{middleStr}</color></b>");
+            GUILayout.Label($"<b><color=#{colorStr}> Выкл{middleStr}</color></b>");
         }
     }
 
@@ -481,7 +484,7 @@ public class OverloadUI : MonoBehaviour
     {
         _scrollPosition = GUILayout.BeginScrollView(_scrollPosition, false, false);
 
-        foreach (var log in _logEntries)
+        foreach (var log in _logEntries)        // Вывод всех записей лога
         {
             GUILayout.Label(log, _logStyle);
         }
@@ -490,7 +493,7 @@ public class OverloadUI : MonoBehaviour
 
         GUILayout.BeginHorizontal(GUILayout.ExpandWidth(false));
 
-        if (GUILayout.Button("Clear Log"))
+        if (GUILayout.Button("Очистить лог"))   // Кнопка очистки лога
         {
             _logEntries.Clear();
         }
