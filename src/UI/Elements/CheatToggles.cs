@@ -8,13 +8,13 @@ namespace MalumMenu;
 
 public struct CheatToggles
 {
-    // Movement
+    // Движение
     public static bool noClip;
     public static bool teleportPlayer;
     public static bool teleportCursor;
     public static bool invertControls;
 
-    // Roles
+    // Роли
     public static bool setFakeRole;
     public static bool setFakeAlive;
     public static bool noKillCd;
@@ -48,18 +48,18 @@ public struct CheatToggles
     public static bool revealVotes;
     public static bool seeLobbyInfo;
 
-    // Camera
+    // Камера
     public static bool spectate;
     public static bool zoomOut;
     public static bool freecam;
 
-    // Minimap
+    // Мини-карта
     public static bool mapCrew;
     public static bool mapImps;
     public static bool mapGhosts;
     public static bool colorBasedMap;
 
-    // Tracers
+    // Трассеры
     public static bool tracersImps;
     public static bool tracersCrew;
     public static bool tracersGhosts;
@@ -67,7 +67,7 @@ public struct CheatToggles
     public static bool colorBasedTracers;
     public static bool distanceBasedTracers;
 
-    // Chat
+    // Чат
     public static bool enableChat;
     public static bool unlockCharacters;
     public static bool bypassUrlBlock;
@@ -75,7 +75,7 @@ public struct CheatToggles
     public static bool unlockClipboard;
     public static bool lowerRateLimits;
 
-    // Ship
+    // Корабль
     public static bool closeMeeting;
     public static bool autoOpenDoorsOnUse;
     public static bool unfixableLights;
@@ -83,7 +83,7 @@ public struct CheatToggles
     public static bool reportBody;
     public static bool autoReportBodies;
 
-    // Sabotage
+    // Саботаж
     public static bool commsSab;
     public static bool elecSab;
     public static bool reactorSab;
@@ -97,12 +97,12 @@ public struct CheatToggles
     public static bool spamCloseAllDoors;
     public static bool sabotageMap;
 
-    // Vents
+    // Вентиляция
     public static bool unlockVents;
     public static bool walkInVents;
     public static bool kickVents;
 
-    // Animations
+    // Анимации
     public static bool animShields;
     public static bool animAsteroids;
     public static bool animEmptyGarbage;
@@ -111,7 +111,7 @@ public struct CheatToggles
     public static bool animPet;
     public static bool moonWalk;
 
-    // Overload
+    // Перегрузка
     public static bool showOverload;
     public static bool showOverloadSettings;
     public static bool olAutoStart;
@@ -134,7 +134,7 @@ public struct CheatToggles
     public static bool overloadImps;
     public static bool overloadReset;
 
-    // Console
+    // Консоль
     public static bool showConsole;
     public static bool logDeaths;
     public static bool logShapeshifts;
@@ -142,7 +142,7 @@ public struct CheatToggles
     public static bool logTasks;
     public static bool logGameState;
 
-    // Host-Only
+    // Только для хоста
     public static bool voteImmune;
     public static bool forceRole;
     public static RoleTypes? forcedRole;
@@ -159,31 +159,31 @@ public struct CheatToggles
     public static bool killAllCrew;
     public static bool killAllImps;
 
-    // Passive
+    // Пассивные
     public static bool unlockFeatures;
     public static bool freeCosmetics;
     public static bool avoidPenalties;
     public static bool copyLobbyCodeOnDisconnect;
     public static bool spoofAprilFoolsDate;
 
-    // Modes
+    // Режимы
     public static bool rgbMode;
     public static bool stealthMode;
     public static bool panicMode;
 
-    // Config
+    // Конфиг
     public static bool reloadConfig;
     public static bool openConfig;
     public static bool loadProfile;
     public static bool saveProfile;
 
-    // Keybind Map: Toggle Name -> KeyCode (KeyCode.None == No Key)
+    // Карта биндов: Имя переключателя -> KeyCode (KeyCode.None == нет клавиши)
     public static readonly Dictionary<string, KeyCode> Keybinds = new();
 
-    // Map for Reflection Access: Toggle Name -> FieldInfo
+    // Карта для доступа через рефлексию: Имя переключателя -> FieldInfo
     public static readonly Dictionary<string, FieldInfo> ToggleFields = new();
 
-    // Populate reflection map once at startup and initialize Keybinds with KeyCode.None
+    // Заполняем карту рефлексии один раз при старте и инициализируем Keybinds значением KeyCode.None
     static CheatToggles()
     {
         var fields = typeof(CheatToggles).GetFields(BindingFlags.Static | BindingFlags.Public);
@@ -197,6 +197,7 @@ public struct CheatToggles
         }
     }
 
+    // Отключает все читы, связанные с меню выбора игрока (PPM), кроме указанного
     public static void DisablePPMCheats(string variableToKeep)
     {
         ejectPlayer = variableToKeep == "ejectPlayer" && ejectPlayer;
@@ -210,12 +211,13 @@ public struct CheatToggles
         teleportPlayer = variableToKeep == "teleportPlayer" && teleportPlayer;
     }
 
+    // Возвращает true, если меню выбора игрока (PPM) должно закрыться (нет активных PPM-читов)
     public static bool ShouldPPMClose()
     {
         return !setFakeRole && !setFakeAlive && !forceRole && !ejectPlayer && !reportBody && !telekillPlayer && !killPlayer && !spectate && !teleportPlayer;
     }
 
-    // Disables all cheat toggles by setting all to false using the cached ToggleFields
+    // Отключает все читы, устанавливая всем значение false через кэш ToggleFields
     public static void DisableAll()
     {
         foreach (var field in ToggleFields.Values)
@@ -224,29 +226,29 @@ public struct CheatToggles
         }
     }
 
-    // Saves cheat toggles and their keybinds to MalumProfile.txt
-    // Format per line: ToggleName = True/False = KeyCode.KEY
+    // Сохраняет переключатели читов и их бинды в MalumProfile.txt
+    // Формат строки: ИмяПереключателя = True/False = KeyCode.KEY
     public static void SaveTogglesToProfile()
     {
         using var writer = new StreamWriter(MalumMenu.ProfilePath);
 
         writer.WriteLine("# MalumProfile");
-        writer.WriteLine("# Format: ToggleName = True/False = KeyCode.KEY");
-        writer.WriteLine("# - List of supported keycodes: https://docs.unity3d.com/Packages/com.unity.tiny@0.16/api/Unity.Tiny.Input.KeyCode.html");
-        writer.WriteLine("# - Setting a keybind is optional. Use KeyCode.None to not set a keybind");
-        writer.WriteLine("# - Multiple toggles may have the same key, but multiple keys per toggle are NOT supported");
-        writer.WriteLine("# - Keybinds are only applied after loading this profile by pressing 'Load from Profile' in the Config menu");
+        writer.WriteLine("# Формат: ИмяПереключателя = True/False = KeyCode.KEY");
+        writer.WriteLine("# - Список поддерживаемых кодов клавиш: https://docs.unity3d.com/Packages/com.unity.tiny@0.16/api/Unity.Tiny.Input.KeyCode.html");
+        writer.WriteLine("# - Установка бинда необязательна. Используйте KeyCode.None, чтобы не задавать бинд");
+        writer.WriteLine("# - Несколько переключателей могут иметь одну и ту же клавишу, но несколько клавиш на один переключатель НЕ поддерживаются");
+        writer.WriteLine("# - Бинды применяются только после загрузки этого профиля через кнопку 'Загрузить из профиля' в меню Конфиг");
         writer.WriteLine();
 
         foreach (var field in ToggleFields.Values)
         {
-            Keybinds.TryGetValue(field.Name, out var key);  // If no key is set then write KeyCode.None
+            Keybinds.TryGetValue(field.Name, out var key);  // Если клавиша не установлена, пишем KeyCode.None
             writer.WriteLine($"{field.Name} = {field.GetValue(null)} = KeyCode.{key}");
         }
     }
 
-    // Loads cheat toggles and their keybinds from MalumProfile.txt if the file is present
-    // Format per line: ToggleName = True/False = KeyCode.KEY
+    // Загружает переключатели читов и их бинды из MalumProfile.txt, если файл существует
+    // Формат строки: ИмяПереключателя = True/False = KeyCode.KEY
     public static void LoadTogglesFromProfile()
     {
         if (!File.Exists(MalumMenu.ProfilePath)) return;
@@ -255,28 +257,28 @@ public struct CheatToggles
 
         while (reader.ReadLine() is { } line)
         {
-            // Skips empty lines
+            // Пропускаем пустые строки
             if (string.IsNullOrWhiteSpace(line)) continue;
 
-            // Skips lines that are commented out
+            // Пропускаем закомментированные строки
             line = line.Trim();
             if (line.StartsWith("#")) continue;
 
-            // Extracts the three relevant config values for each remaining line
+            // Извлекаем три значимых значения из каждой оставшейся строки
             var parts = line.Split('=', 3);
             if (parts.Length < 2) continue;
 
-            // Gets the cheat's FieldInfo from its name
+            // Получаем FieldInfo чита по его имени
             var name = parts[0].Trim();
             if (!ToggleFields.TryGetValue(name, out var field)) continue;
 
-            // Loads whether the cheat is enabled or disabled by default
+            // Загружаем, включён ли чит по умолчанию
             if (bool.TryParse(parts[1].Trim(), out var boolVal))
             {
                 field.SetValue(null, boolVal);
             }
 
-            // Loads the keybind associated with each cheat
+            // Загружаем бинд, связанный с каждым читом
             KeyCode key = KeyCode.None;
             if (parts.Length >= 3)
             {
