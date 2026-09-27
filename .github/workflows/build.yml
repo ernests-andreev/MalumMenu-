@@ -1,0 +1,88 @@
+name: Build MalumMenu RU
+
+on:
+  push:
+    branches: [ main, master ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: '6.0.x'
+  CONFIGURATION: Release
+
+jobs:
+  build:
+    name: Сборка мода
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Клонирование репозитория
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Установка .NET ${{ env.DOTNET_VERSION }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Кэш NuGet-пакетов
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Восстановление зависимостей
+        run: dotnet restore
+
+      - name: Сборка (Release)
+        run: dotnet build --configuration ${{ env.CONFIGURATION }} --no-restore
+
+      - name: Поиск собранного DLL
+        id: find_dll
+        run: |
+          DLL_PATH=$(find . -type f -name "MalumMenu*.dll" -path "*/bin/${{ env.CONFIGURATION }}/*" | head -n 1)
+          if [ -z "$DLL_PATH" ]; then
+            echo "❌ MalumMenu.dll не найден!"
+            exit 1
+          fi
+          echo "dll_path=$DLL_PATH" >> $GITHUB_OUTPUT
+          echo "dll_name=$(basename $DLL_PATH)" >> $GITHUB_OUTPUT
+          echo "✅ Найден: $DLL_PATH"
+
+      - name: Загрузка артефакта сборки
+        uses: actions/upload-artifact@v4
+        with:
+          name: MalumMenu-RU-${{ github.sha }}
+          path: ${{ steps.find_dll.outputs.dll_path }}
+          if-no-files-found: error
+
+      - name: Создание GitHub Release (только для тегов)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "MalumMenu RU ${{ github.ref_name }}"
+          body: |
+            ## MalumMenu RU ${{ github.ref_name }}
+
+            **Автор сборки:** Поджигатель мабоев - Альфредо
+            **Версия:** ${{ github.ref_name }}
+            **Коммит:** ${{ github.sha }}
+
+            ### Установка
+            1. Установите [BepInEx 6 (IL2CPP)](https://github.com/BepInEx/BepInEx/releases) для Among Us
+            2. Поместите `MalumMenu.dll` в `BepInEx/plugins/`
+            3. Запустите игру
+
+            ### Поддерживаемая версия Among Us
+            `2026.8.18`
+          files: ${{ steps.find_dll.outputs.dll_path }}
+          draft: false
+          prerelease: false
+          fail_on_unmatched_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
