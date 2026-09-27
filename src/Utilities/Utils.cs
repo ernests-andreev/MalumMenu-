@@ -20,41 +20,41 @@ namespace MalumMenu;
 public static class Utils
 {
     public static bool isPastingInput;
-    public static ReferenceDataManager ReferenceDataManager = DestroyableSingleton<ReferenceDataManager>.Instance; // Useful for getting full lists of all the Among Us cosmetics IDs
+    public static ReferenceDataManager ReferenceDataManager = DestroyableSingleton<ReferenceDataManager>.Instance; // Полезно для получения полных списков всех ID косметики Among Us
     public static SabotageSystemType SabotageSystem => ShipStatus.Instance.Systems[SystemTypes.Sabotage].Cast<SabotageSystemType>();
-    public static bool isShip => ShipStatus.Instance;
-    public static bool isClient => AmongUsClient.Instance;
-    public static bool isLobby => AmongUsClient.Instance && AmongUsClient.Instance.GameState == InnerNetClient.GameStates.Joined && !isFreePlay;
-    public static bool isOnlineGame => AmongUsClient.Instance && AmongUsClient.Instance.NetworkMode == NetworkModes.OnlineGame;
-    public static bool isLocalGame => AmongUsClient.Instance && AmongUsClient.Instance.NetworkMode == NetworkModes.LocalGame;
-    public static bool isFreePlay => AmongUsClient.Instance && AmongUsClient.Instance.NetworkMode == NetworkModes.FreePlay;
-    public static bool isPlayer => PlayerControl.LocalPlayer;
-    public static bool isHost => AmongUsClient.Instance && AmongUsClient.Instance.AmHost;
-    public static bool isInGame => AmongUsClient.Instance && AmongUsClient.Instance.GameState == InnerNetClient.GameStates.Started && isPlayer;
-    public static bool isMeeting => MeetingHud.Instance;
-    public static bool isMeetingVoting => isMeeting && MeetingHud.Instance.state is MeetingHud.MeetingStates.Voted or MeetingHud.MeetingStates.NotVoted;
-    public static bool isMeetingProceeding => isMeeting && MeetingHud.Instance.state is MeetingHud.MeetingStates.Proceeding;
-    public static bool isExiling => ExileController.Instance && !(isAirshipMap && SpawnInMinigame.Instance.isActiveAndEnabled);
-    public static bool isAnySabotageActive => ShipStatus.Instance && SabotageSystem.AnyActive;
-    public static bool isNormalGame => GameOptionsManager.Instance.CurrentGameOptions.GameMode == GameModes.Normal;
-    public static bool isHideNSeek => GameOptionsManager.Instance.CurrentGameOptions.GameMode == GameModes.HideNSeek;
-    public static bool isSkeldMap => (MapNames)GetCurrentMapID() == MapNames.Skeld;
-    public static bool isMiraHQMap => (MapNames)GetCurrentMapID() == MapNames.MiraHQ;
-    public static bool isPolusMap => (MapNames)GetCurrentMapID() == MapNames.Polus;
-    public static bool isDleksMap => (MapNames)GetCurrentMapID() == MapNames.Dleks;
-    public static bool isAirshipMap => (MapNames)GetCurrentMapID() == MapNames.Airship;
-    public static bool isFungleMap => (MapNames)GetCurrentMapID() == MapNames.Fungle;
-    public const float DefaultSpeed = 2.5f;
-    public const float DefaultGhostSpeed = 3f;
+    public static bool isShip => ShipStatus.Instance;                                // Находимся ли на корабле
+    public static bool isClient => AmongUsClient.Instance;                            // Являемся ли клиентом
+    public static bool isLobby => AmongUsClient.Instance && AmongUsClient.Instance.GameState == InnerNetClient.GameStates.Joined && !isFreePlay;  // В лобби ли мы
+    public static bool isOnlineGame => AmongUsClient.Instance && AmongUsClient.Instance.NetworkMode == NetworkModes.OnlineGame;  // Онлайн-игра
+    public static bool isLocalGame => AmongUsClient.Instance && AmongUsClient.Instance.NetworkMode == NetworkModes.LocalGame;    // Локальная игра
+    public static bool isFreePlay => AmongUsClient.Instance && AmongUsClient.Instance.NetworkMode == NetworkModes.FreePlay;      // Режим свободной игры
+    public static bool isPlayer => PlayerControl.LocalPlayer;                         // Есть ли локальный игрок
+    public static bool isHost => AmongUsClient.Instance && AmongUsClient.Instance.AmHost;  // Являемся ли хостом
+    public static bool isInGame => AmongUsClient.Instance && AmongUsClient.Instance.GameState == InnerNetClient.GameStates.Started && isPlayer;  // Идёт ли игра
+    public static bool isMeeting => MeetingHud.Instance;                              // Идёт ли собрание
+    public static bool isMeetingVoting => isMeeting && MeetingHud.Instance.state is MeetingHud.MeetingStates.Voted or MeetingHud.MeetingStates.NotVoted;  // Идёт ли голосование
+    public static bool isMeetingProceeding => isMeeting && MeetingHud.Instance.state is MeetingHud.MeetingStates.Proceeding;  // Обработка результатов собрания
+    public static bool isExiling => ExileController.Instance && !(isAirshipMap && SpawnInMinigame.Instance.isActiveAndEnabled);  // Идёт ли изгнание
+    public static bool isAnySabotageActive => ShipStatus.Instance && SabotageSystem.AnyActive;  // Активна ли какая-либо саботаж
+    public static bool isNormalGame => GameOptionsManager.Instance.CurrentGameOptions.GameMode == GameModes.Normal;      // Обычный режим
+    public static bool isHideNSeek => GameOptionsManager.Instance.CurrentGameOptions.GameMode == GameModes.HideNSeek;    // Прятки
+    public static bool isSkeldMap => (MapNames)GetCurrentMapID() == MapNames.Skeld;      // Карта Skeld
+    public static bool isMiraHQMap => (MapNames)GetCurrentMapID() == MapNames.MiraHQ;    // Карта MiraHQ
+    public static bool isPolusMap => (MapNames)GetCurrentMapID() == MapNames.Polus;      // Карта Polus
+    public static bool isDleksMap => (MapNames)GetCurrentMapID() == MapNames.Dleks;      // Карта Dleks
+    public static bool isAirshipMap => (MapNames)GetCurrentMapID() == MapNames.Airship;  // Карта Airship
+    public static bool isFungleMap => (MapNames)GetCurrentMapID() == MapNames.Fungle;    // Карта Fungle
+    public const float DefaultSpeed = 2.5f;         // Скорость по умолчанию
+    public const float DefaultGhostSpeed = 3f;      // Скорость призрака по умолчанию
 
-    // Checks if LocalPlayer's speed is at its default value
+    // Проверяет, что скорость LocalPlayer на значении по умолчанию
     public static bool IsSpeedDefault(bool forGhost = false)
     {
         return forGhost ? Mathf.Approximately(PlayerControl.LocalPlayer.MyPhysics.GhostSpeed, DefaultGhostSpeed) :
             Mathf.Approximately(PlayerControl.LocalPlayer.MyPhysics.Speed, DefaultSpeed);
     }
 
-    // Snaps LocalPlayer's speed to the default if within snapRange
+    // Притягивает скорость LocalPlayer к значению по умолчанию, если в пределах snapRange
     public static void SnapSpeedToDefault(float snapRange, bool forGhost = false)
     {
         if (forGhost)
@@ -69,19 +69,19 @@ public static class Utils
         }
     }
 
-    // Gets a player's real name, display name, and whether they are disguised or not
+    // Получает реальное имя игрока, отображаемое имя и признак маскировки
     public static (string realName, string displayName, bool isDisguised) GetPlayerIdentity(PlayerControl player)
     {
         if (player == null || player.Data == null) return ("", "", false);
 
-        var realName = $"<color=#{ColorUtility.ToHtmlStringRGB(player.Data.Color)}>{player.Data.PlayerName}</color>";
-        var displayName = $"<color=#{ColorUtility.ToHtmlStringRGB(Palette.PlayerColors[player.CurrentOutfit.ColorId])}>{player.CurrentOutfit.PlayerName}</color>";
-        var isDisguised = player.CurrentOutfit.PlayerName != player.Data.PlayerName;
+        var realName = $"<color=#{ColorUtility.ToHtmlStringRGB(player.Data.Color)}>{player.Data.PlayerName}</color>";         // Реальное имя с цветом
+        var displayName = $"<color=#{ColorUtility.ToHtmlStringRGB(Palette.PlayerColors[player.CurrentOutfit.ColorId])}>{player.CurrentOutfit.PlayerName}</color>";  // Отображаемое имя с цветом
+        var isDisguised = player.CurrentOutfit.PlayerName != player.Data.PlayerName;  // Маскируется ли
 
         return (realName, displayName, isDisguised);
     }
 
-    // Checks if player is currently vanished
+    // Проверяет, является ли игрок сейчас исчезнувшим (невидимым)
     public static bool IsVanished(NetworkedPlayerInfo playerInfo)
     {
         PhantomRole phantomRole = playerInfo.Role as PhantomRole;
@@ -94,7 +94,7 @@ public static class Utils
         return false;
     }
 
-    // Checks whether a player is a valid target depending on whether killAnyone cheat is enabled or not
+    // Проверяет, является ли игрок допустимой целью в зависимости от того, включён чит killAnyone или нет
     public static bool IsValidTarget(NetworkedPlayerInfo target)
     {
         var killAnyoneRequirements = target && !target.Disconnected && target.Object.Visible && target.PlayerId != PlayerControl.LocalPlayer.PlayerId && target.Role && target.Object;
@@ -118,20 +118,20 @@ public static class Utils
         return playerDataList;
     }
 
-    // Adjusts HUD resolution
-    // Used to fix UI problems when zooming out
+    // Настраивает разрешение HUD
+    // Используется для исправления проблем UI при отдалении
     public static void AdjustResolution()
     {
         ResolutionManager.ResolutionChanged.Invoke((float)Screen.width / Screen.height, Screen.width, Screen.height, Screen.fullScreen);
     }
 
-    // Gets RoleBehaviour from a RoleType
+    // Получает RoleBehaviour из RoleType
     public static RoleBehaviour GetBehaviourByRoleType(RoleTypes roleType)
     {
         return RoleManager.Instance.AllRoles.ToArray().First(r => r.Role == roleType);
     }
 
-    // Gets RoleBehaviour from a TeamType
+    // Получает RoleBehaviour из TeamType
     public static RoleBehaviour GetBehaviourByTeamType(RoleTeamTypes roleTeamType)
     {
         RoleTypes roleType = (RoleTypes)Enum.Parse(typeof(RoleTypes), roleTeamType.ToString(), true);
@@ -150,22 +150,22 @@ public static class Utils
 
     public static void ForcePlayAnimation(byte animationType)
     {
-        // PlayerControl.LocalPlayer.RpcPlayAnimation(1) wouldn't work if visual tasks are turned off
-        // The below way makes sure it works regardless of visual task settings
+        // PlayerControl.LocalPlayer.RpcPlayAnimation(1) не сработал бы, если визуальные задачи отключены
+        // Приведённый ниже способ работает независимо от настроек визуальных задач
 
         PlayerControl.LocalPlayer.PlayAnimation(animationType);
         RpcPlayAnimationMessage rpcMessage = new(PlayerControl.LocalPlayer.NetId, animationType);
         AmongUsClient.Instance.LateBroadcastUnreliableMessage(Unsafe.As<IGameDataMessage>(rpcMessage));
     }
 
-    // Coroutine to teleport the LocalPlayer to a position after a delay
+    // Корутина для телепортации LocalPlayer в позицию после задержки
     public static System.Collections.IEnumerator DelayedSnapTo(Vector2 position, float delay = 0.25f)
     {
         yield return new WaitForSeconds(delay);
         PlayerControl.LocalPlayer.NetTransform.RpcSnapTo(position);
     }
 
-    // Kills any player using RPC calls
+    // Убивает любого игрока с помощью RPC-вызовов
     public static void MurderPlayer(PlayerControl target, MurderResultFlags result)
     {
         if (isFreePlay)
@@ -205,7 +205,7 @@ public static class Utils
         }
     }
 
-    // Opens Chat UI
+    // Открывает UI чата
     public static void OpenChat()
     {
         if (!DestroyableSingleton<HudManager>.Instance.Chat.IsOpenOrOpening)
@@ -225,7 +225,7 @@ public static class Utils
 
     }
 
-    // Draws a tracer line between two GameObjects
+    // Рисует линию-трассер между двумя GameObject
     public static void DrawTracer(GameObject sourceObject, GameObject targetObject, Color color)
     {
         var lineRenderer = sourceObject.GetComponent<LineRenderer>();
@@ -238,7 +238,7 @@ public static class Utils
         lineRenderer.SetVertexCount(2);
         lineRenderer.SetWidth(0.02F, 0.02F);
 
-        // I just picked an already existing material from the game
+        // Я просто взял уже существующий материал из игры
         Material material = DestroyableSingleton<HatManager>.Instance.PlayerMaterial;
 
         lineRenderer.material = material;
@@ -248,7 +248,7 @@ public static class Utils
         lineRenderer.SetPosition(1, targetObject.transform.position);
     }
 
-    // Returns whether the ChatUI should be active or not
+    // Возвращает, должен ли ChatUI быть активным или нет
     public static bool IsChatUiActive()
     {
         try
@@ -261,8 +261,8 @@ public static class Utils
         }
     }
 
-    // Returns the max number of nested RPCs that can be in a GameData message
-    // without getting kicked by AC
+    // Возвращает максимальное количество вложенных RPC, которое может быть в GameData сообщении
+    // без кика от AC (античита)
     public static int GetMaxRpcPackingLimit()
     {
         int num = 0;
@@ -275,9 +275,9 @@ public static class Utils
         return 10 + num;
     }
 
-    // Overloads target with set strength using Pet RPCs that
-    // repeatedly restart the hand-petting animation, preventing old petting coroutines
-    // from resolving
+    // Перегружает цель заданной силой, используя Pet RPC, которые
+    // многократно перезапускают анимацию поглаживания рукой, не давая старым
+    // корутинам поглаживания завершиться
     public static void Overload(int targetId, int strength)
     {
         if (strength < 1) return;
@@ -289,11 +289,11 @@ public static class Utils
 
         if (strength <= maxRpc)
         {
-            // SendOption.None has no flow control, allowing for flooding without limits
+            // SendOption.None не имеет контроля потока, что позволяет флудить без ограничений
 
             var messageWriter = MessageWriter.Get(SendOption.None);
 
-            if (targetId < 0) // -1 = Broadcast
+            if (targetId < 0) // -1 = Широковещательная рассылка
             {
                 messageWriter.StartMessage(Tags.GameData);
                 messageWriter.Write(AmongUsClient.Instance.GameId);
@@ -313,13 +313,13 @@ public static class Utils
 
                 messageWriter.Write(rpcCall);
 
-                // Use LocalPlayer.GetTruePosition() as the petting position
-                // to minimize WalkPlayerTo delay and start the hand-petting animation immediately
+                // Используем LocalPlayer.GetTruePosition() как позицию поглаживания,
+                // чтобы минимизировать задержку WalkPlayerTo и сразу запустить анимацию поглаживания
 
                 NetHelpers.WriteVector2(PlayerControl.LocalPlayer.GetTruePosition(), messageWriter);
 
-                // Pet position is decoded as (-50, -50) on target clients
-                // This keeps the hand-petting animation out of normal view
+                // Позиция поглаживания декодируется как (-50, -50) на клиентах целей
+                // Это держит анимацию поглаживания вне обычного поля зрения
 
                 messageWriter.Write((ushort)0);
 
@@ -348,7 +348,7 @@ public static class Utils
         }
     }
 
-    // Closes Chat UI
+    // Закрывает UI чата
     public static void CloseChat()
     {
         if (DestroyableSingleton<HudManager>.Instance.Chat.IsOpenOrOpening)
@@ -357,7 +357,7 @@ public static class Utils
         }
     }
 
-    // Gets the distance between two players
+    // Получает расстояние между двумя игроками
     public static float GetDistanceBetween(PlayerControl source, PlayerControl target)
     {
 
@@ -368,7 +368,7 @@ public static class Utils
 
     }
 
-    // Returns a list of all the players in the game ordered from closest to farthest (from LocalPlayer by default)
+    // Возвращает список всех игроков в игре, отсортированный от ближайших к дальним (от LocalPlayer по умолчанию)
     public static System.Collections.Generic.List<PlayerControl> GetPlayersSortedByDistance(PlayerControl source = null)
     {
 
@@ -396,65 +396,65 @@ public static class Utils
         return outputList.Count <= 0 ? null : outputList;
     }
 
-    // Returns current map ID if available
+    // Возвращает текущий ID карты, если доступен
     public static byte GetCurrentMapID()
     {
-        // Works for the tutorial
+        // Работает для обучения
         if (isFreePlay)
         {
             return (byte)AmongUsClient.Instance.TutorialMapId;
         }
 
-        // Works for local / online games
+        // Работает для локальных / онлайн-игр
         if (GameOptionsManager.Instance?.currentGameOptions != null)
         {
             return GameOptionsManager.Instance.currentGameOptions.MapId;
         }
 
-        // Defaults to byte.MaxValue if the current map ID is unavailable
+        // По умолчанию byte.MaxValue, если текущий ID карты недоступен
         return byte.MaxValue;
     }
 
-    // Gets SystemType of the room the player is currently in
+    // Получает SystemType комнаты, в которой сейчас находится игрок
     public static SystemTypes GetCurrentRoom()
     {
         return HudManager.Instance.roomTracker.LastRoom.RoomId;
     }
 
-    // Gets the PlainShipRoom of room that overlaps specified position
+    // Получает PlainShipRoom комнаты, которая перекрывает указанную позицию
     public static PlainShipRoom GetRoomFromPosition(Vector2 position)
     {
         return ShipStatus.Instance == null ? null : ShipStatus.Instance.AllRooms.FirstOrDefault(
             room => room != null && room.roomArea != null && room.roomArea.OverlapPoint(position));
     }
 
-    // Returns colored ping text for PingTracker
+    // Возвращает цветной текст пинга для PingTracker
     public static string GetColoredPingText(string pingText, int ping)
     {
         return ping switch
         {
-            < 1 => $"<color=#b8b8b8>{pingText}</color>", // Grey for ping < 1
-            < 100 => $"<color=#00ff00ff>{pingText}</color>", // Green for ping < 100
-            < 400 => $"<color=#ffff00ff>{pingText}</color>", // Yellow for 100 < ping < 400
-            _ => $"<color=#ff0000ff>{pingText}</color>" // Red for ping > 400
+            < 1 => $"<color=#b8b8b8>{pingText}</color>", // Серый для пинга < 1
+            < 100 => $"<color=#00ff00ff>{pingText}</color>", // Зелёный для пинга < 100
+            < 400 => $"<color=#ffff00ff>{pingText}</color>", // Жёлтый для 100 < пинг < 400
+            _ => $"<color=#ff0000ff>{pingText}</color>" // Красный для пинга > 400
         };
     }
 
-    // Returns the current approximate FPS
+    // Возвращает текущий приблизительный FPS
     public static int GetFps()
     {
         return (int)(1f / Time.unscaledDeltaTime);
     }
 
-    // Gets a UnityEngine.KeyCode from a string
+    // Получает UnityEngine.KeyCode из строки
     public static KeyCode StringToKeycode(string keyCodeStr)
     {
 
-        if(!string.IsNullOrEmpty(keyCodeStr)) // Empty strings are automatically invalid
+        if(!string.IsNullOrEmpty(keyCodeStr)) // Пустые строки автоматически недействительны
         {
             try
             {
-                // Case-insensitive parse of UnityEngine.KeyCode to check if string is valid
+                // Регистронезависимый парсинг UnityEngine.KeyCode для проверки валидности строки
                 KeyCode keyCode = (KeyCode)Enum.Parse(typeof(KeyCode), keyCodeStr, true);
 
                 return keyCode;
@@ -464,25 +464,25 @@ public static class Utils
             catch { }
         }
 
-        return KeyCode.Delete; // If string is invalid, return Delete as the default key
+        return KeyCode.Delete; // Если строка недействительна, возвращаем Delete как клавишу по умолчанию
     }
 
-    // Gets a platform type from a string
+    // Получает тип платформы из строки
     public static bool StringToPlatformType(string platformStr, out Platforms? platform)
     {
-        if (!string.IsNullOrEmpty(platformStr)) // Empty strings are automatically invalid
+        if (!string.IsNullOrEmpty(platformStr)) // Пустые строки автоматически недействительны
         {
             try
             {
-                // Case-insensitive parse of Platforms from string (if it valid)
+                // Регистронезависимый парсинг Platforms из строки (если валидна)
                 platform = (Platforms)Enum.Parse(typeof(Platforms), platformStr, true);
 
-                return true; // If platform type is valid, return false
+                return true; // Если тип платформы валиден, возвращаем true
             }catch{}
         }
 
         platform = null;
-        return false; // If platform type is invalid, return false
+        return false; // Если тип платформы недействителен, возвращаем false
     }
 
     public static string PlatformTypeToString(Platforms platform)
@@ -500,12 +500,12 @@ public static class Utils
             Platforms.Xbox => "Xbox",
             Platforms.Playstation => "PlayStation",
             (Platforms)112 => "Starlight",
-            _ => "Unknown"
+            _ => "Unknown"   // Неизвестно
         };
     }
 
-    // Gets the name for a specified player's role as a string
-    // Strings are automatically translated
+    // Получает имя роли указанного игрока в виде строки
+    // Строки автоматически переводятся
     public static string GetRoleName(NetworkedPlayerInfo playerData)
     {
         var translatedRole = DestroyableSingleton<TranslationController>.Instance.GetString(playerData.Role.StringName, Il2CppSystem.Array.Empty<Il2CppSystem.Object>());
@@ -515,7 +515,7 @@ public static class Utils
         return translatedRole;
     }
 
-    // Gets the appropriate nametag for a player
+    // Получает подходящий неймтег для игрока
     public static string GetNameTag(NetworkedPlayerInfo playerInfo, string playerName, bool isChat = false, bool isMatchInfo = false)
     {
         var nameTag = playerName;
@@ -535,7 +535,7 @@ public static class Utils
 
         var roleColor = ColorUtility.ToHtmlStringRGB(playerInfo.Role.TeamColor);
 
-        var hostString = player == host ? "Host - " : "";
+        var hostString = player == host ? "Host - " : "";   // "Хост - " если это хост
 
         if (CheatToggles.seeRoles)
         {
@@ -609,7 +609,7 @@ public static class Utils
         return nameTag;
     }
 
-    // Returns a player's NetworkedPlayerInfo from their client ID
+    // Возвращает NetworkedPlayerInfo игрока по его client ID
     public static NetworkedPlayerInfo GetPlayerDataFromClientId(int clientId)
     {
         var players = PlayerControl.AllPlayerControls.ToArray();
@@ -623,10 +623,10 @@ public static class Utils
 			}
 		}
 
-        return null; // Returns null if no matching player is found
+        return null; // Возвращает null, если соответствующий игрок не найден
     }
 
-    // Returns a random 1 - 12 characters long name
+    // Возвращает случайное имя длиной от 1 до 12 символов
     public static string GetRandomName()
     {
         var length = UnityEngine.Random.Range(1, 13);
@@ -634,7 +634,7 @@ public static class Utils
         return new string(Enumerable.Repeat(chars, length).Select(s => s[UnityEngine.Random.Range(0, s.Length)]).ToArray());
     }
 
-    // Returns current AmongUsClient ping in ms
+    // Возвращает текущий пинг AmongUsClient в мс
     public static int GetPing()
     {
         if (isClient && AmongUsClient.Instance.AmClient)
@@ -643,12 +643,12 @@ public static class Utils
         }
         else
         {
-            return 0; // Returns 0 if not connected to a game
+            return 0; // Возвращает 0, если не подключены к игре
         }
     }
 
-    // Shows a custom popup ingame
-    // Found here: https://github.com/NuclearPowered/Reactor/blob/6eb0bf19c30733b78532dada41db068b2b247742/Reactor/Networking/Patches/HttpPatches.cs
+    // Показывает кастомный попап в игре
+    // Найдено здесь: https://github.com/NuclearPowered/Reactor/blob/6eb0bf19c30733b78532dada41db068b2b247742/Reactor/Networking/Patches/HttpPatches.cs
     public static void ShowPopup(string text)
     {
         var popup = UnityEngine.Object.Instantiate(DiscordManager.Instance.discordPopup, Camera.main!.transform);
@@ -667,8 +667,8 @@ public static class Utils
         DestroyableSingleton<DisconnectPopup>.Instance.ShowCustom(text);
     }
 
-    // Loads sprites from manifest resources
-    // Found here: https://github.com/Loonie-Toons/TOHE-Restored/blob/TOHE/Modules/Utils.cs
+    // Загружает спрайты из ресурсов манифеста
+    // Найдено здесь: https://github.com/Loonie-Toons/TOHE-Restored/blob/TOHE/Modules/Utils.cs
     public static Dictionary<string, Sprite> CachedSprites = new();
     public static Sprite LoadSprite(string path, float pixelsPerUnit = 1f)
     {
@@ -684,13 +684,13 @@ public static class Utils
         }
         catch
         {
-            MalumMenu.Log.LogError($"Failed to read Texture: {path}");
+            MalumMenu.Log.LogError($"Не удалось прочитать текстуру: {path}");
         }
         return null;
     }
 
-    // Loads textures from manifest resources
-    // Found here: https://github.com/Loonie-Toons/TOHE-Restored/blob/TOHE/Modules/Utils.cs
+    // Загружает текстуры из ресурсов манифеста
+    // Найдено здесь: https://github.com/Loonie-Toons/TOHE-Restored/blob/TOHE/Modules/Utils.cs
     public static Texture2D LoadTextureFromResources(string path)
     {
         try
@@ -705,12 +705,12 @@ public static class Utils
         }
         catch
         {
-            MalumMenu.Log.LogError($"Failed to read Texture: {path}");
+            MalumMenu.Log.LogError($"Не удалось прочитать текстуру: {path}");
         }
         return null;
     }
 
-    // Opens the config file in the default text editor
+    // Открывает файл конфигурации в редакторе по умолчанию
     public static void OpenConfigFile()
     {
         var configFilePath = MalumMenu.Plugin.Config.ConfigFilePath;
@@ -737,18 +737,18 @@ public static class Utils
             }
             else
             {
-                MalumMenu.Log.LogError("Configuration file does not exist");
+                MalumMenu.Log.LogError("Файл конфигурации не существует");
             }
         }
         else
         {
-            MalumMenu.Log.LogError("Configuration editor not specified");
+            MalumMenu.Log.LogError("Редактор конфигурации не указан");
         }
     }
 
     public class PanicCleaner : MonoBehaviour
     {
-        // Creates a PanicCleaner to unpatch Harmony
+        // Создаёт PanicCleaner для снятия патчей Harmony
         public static void Create()
         {
             ClassInjector.RegisterTypeInIl2Cpp<PanicCleaner>();
@@ -757,8 +757,8 @@ public static class Utils
             go.AddComponent<PanicCleaner>();
         }
 
-        // Unpatching Harmony in handled in the next frame after creation
-        // This allows some patches to run for a last time and finish properly
+        // Снятие патчей Harmony обрабатывается на следующем кадре после создания
+        // Это позволяет некоторым патчам выполниться в последний раз и корректно завершиться
         private void LateUpdate()
         {
             try { Harmony.UnpatchID(MalumMenu.Id); } catch { }
@@ -768,9 +768,9 @@ public static class Utils
 
     public static void Panic()
     {
-        MalumMenu.isPanicked = true;
+        MalumMenu.isPanicked = true;    // Флаг паники
 
-        CheatToggles.DisableAll();
+        CheatToggles.DisableAll();      // Отключить все читы
 
         var stamp = ModManager.Instance.ModStamp;
         if (stamp) stamp.enabled = false;
@@ -793,6 +793,6 @@ public static class Utils
 
         UnityEngine.Object.Destroy(MalumMenu.keybindListener);
 
-        PanicCleaner.Create();
+        PanicCleaner.Create();      // Создать PanicCleaner для снятия патчей
     }
 }
