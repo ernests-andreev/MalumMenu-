@@ -4,7 +4,7 @@ namespace MalumMenu;
 
 public class RolesTab : ITab
 {
-    public string name => "Roles";
+    public string name => "Роли";        // Название вкладки
 
     public void Draw()
     {
@@ -12,37 +12,37 @@ public class RolesTab : ITab
 
         GUILayout.BeginVertical(GUILayout.Width(MenuUI.windowWidth * 0.425f));
 
-        DrawGeneral();
+        DrawGeneral();      // Основные
 
         GUILayout.Space(15);
 
-        DrawImpostor();
+        DrawImpostor();     // Предатель
 
         GUILayout.Space(15);
 
-        DrawShapeshifter();
+        DrawShapeshifter(); // Оборотень
 
         GUILayout.Space(15);
 
-        DrawCrewmate();
+        DrawCrewmate();     // Член экипажа
 
         GUILayout.Space(15);
 
-        DrawTracker();
+        DrawTracker();      // Трекер
 
         GUILayout.EndVertical();
 
         GUILayout.BeginVertical();
 
-        DrawEngineer();
+        DrawEngineer();     // Инженер
 
         GUILayout.Space(15);
 
-        DrawScientist();
+        DrawScientist();    // Учёный
 
         GUILayout.Space(15);
 
-        DrawDetective();
+        DrawDetective();    // Детектив
 
         GUILayout.EndVertical();
 
@@ -51,71 +51,71 @@ public class RolesTab : ITab
 
     private void DrawGeneral()
     {
-        CheatToggles.setFakeRole = GUILayout.Toggle(CheatToggles.setFakeRole, " Set Fake Role");
+        CheatToggles.setFakeRole = GUILayout.Toggle(CheatToggles.setFakeRole, " Установить фейковую роль");
 
-        CheatToggles.setFakeAlive = GUILayout.Toggle(CheatToggles.setFakeAlive, " Set Fake Alive");
+        CheatToggles.setFakeAlive = GUILayout.Toggle(CheatToggles.setFakeAlive, " Установить фейковый статус живого");
     }
 
     private void DrawImpostor()
     {
-        GUILayout.Label("Impostor", GUIStylePreset.TabSubtitle);
+        GUILayout.Label("Предатель", GUIStylePreset.TabSubtitle);   // Подзаголовок: "Предатель"
 
-        CheatToggles.killReach = GUILayout.Toggle(CheatToggles.killReach, " Kill Reach");
+        CheatToggles.killReach = GUILayout.Toggle(CheatToggles.killReach, " Дальность убийства");
 
-        // CheatToggles.impostorTasks = GUILayout.Toggle(CheatToggles.impostorTasks, " Allow Tasks");
+        // CheatToggles.impostorTasks = GUILayout.Toggle(CheatToggles.impostorTasks, " Разрешить задачи");
     }
 
     private void DrawShapeshifter()
     {
-        GUILayout.Label("Shapeshifter", GUIStylePreset.TabSubtitle);
+        GUILayout.Label("Оборотень", GUIStylePreset.TabSubtitle);   // Подзаголовок: "Оборотень"
 
-        CheatToggles.noShapeshiftAnim = GUILayout.Toggle(CheatToggles.noShapeshiftAnim, " No Ss Animation");
+        CheatToggles.noShapeshiftAnim = GUILayout.Toggle(CheatToggles.noShapeshiftAnim, " Без анимации превращения");
 
-        CheatToggles.endlessSsDuration = GUILayout.Toggle(CheatToggles.endlessSsDuration, " Endless Ss Duration");
+        CheatToggles.endlessSsDuration = GUILayout.Toggle(CheatToggles.endlessSsDuration, " Бесконечное превращение");
     }
 
     private void DrawCrewmate()
     {
-        GUILayout.Label("Crewmate", GUIStylePreset.TabSubtitle);
+        GUILayout.Label("Член экипажа", GUIStylePreset.TabSubtitle);   // Подзаголовок: "Член экипажа"
 
-        CheatToggles.showTasksMenu = GUILayout.Toggle(CheatToggles.showTasksMenu, " Show Tasks Menu");
+        CheatToggles.showTasksMenu = GUILayout.Toggle(CheatToggles.showTasksMenu, " Показать меню задач");
     }
 
     private void DrawTracker()
     {
-        GUILayout.Label("Tracker", GUIStylePreset.TabSubtitle);
+        GUILayout.Label("Трекер", GUIStylePreset.TabSubtitle);   // Подзаголовок: "Трекер"
 
-        CheatToggles.endlessTracking = GUILayout.Toggle(CheatToggles.endlessTracking, " Endless Tracking");
+        CheatToggles.endlessTracking = GUILayout.Toggle(CheatToggles.endlessTracking, " Бесконечное отслеживание");
 
-        CheatToggles.noTrackingDelay = GUILayout.Toggle(CheatToggles.noTrackingDelay, " No Track Delay");
+        CheatToggles.noTrackingDelay = GUILayout.Toggle(CheatToggles.noTrackingDelay, " Без задержки отслеживания");
 
-        CheatToggles.noTrackingCooldown = GUILayout.Toggle(CheatToggles.noTrackingCooldown, " No Track Cooldown");
+        CheatToggles.noTrackingCooldown = GUILayout.Toggle(CheatToggles.noTrackingCooldown, " Без перезарядки отслеживания");
 
-        CheatToggles.trackReach = GUILayout.Toggle(CheatToggles.trackReach, " Track Reach");
+        CheatToggles.trackReach = GUILayout.Toggle(CheatToggles.trackReach, " Дальность отслеживания");
     }
 
     private void DrawEngineer()
     {
-        GUILayout.Label("Engineer", GUIStylePreset.TabSubtitle);
+        GUILayout.Label("Инженер", GUIStylePreset.TabSubtitle);   // Подзаголовок: "Инженер"
 
-        CheatToggles.endlessVentTime = GUILayout.Toggle(CheatToggles.endlessVentTime, " Endless Vent Time");
+        CheatToggles.endlessVentTime = GUILayout.Toggle(CheatToggles.endlessVentTime, " Бесконечное время в вентиляции");
 
-        CheatToggles.noVentCooldown = GUILayout.Toggle(CheatToggles.noVentCooldown, " No Vent Cooldown");
+        CheatToggles.noVentCooldown = GUILayout.Toggle(CheatToggles.noVentCooldown, " Без перезарядки вентиляции");
     }
 
     private void DrawScientist()
     {
-        GUILayout.Label("Scientist", GUIStylePreset.TabSubtitle);
+        GUILayout.Label("Учёный", GUIStylePreset.TabSubtitle);   // Подзаголовок: "Учёный"
 
-        CheatToggles.endlessBattery = GUILayout.Toggle(CheatToggles.endlessBattery, " Endless Battery");
+        CheatToggles.endlessBattery = GUILayout.Toggle(CheatToggles.endlessBattery, " Бесконечная батарея");
 
-        CheatToggles.noVitalsCooldown = GUILayout.Toggle(CheatToggles.noVitalsCooldown, " No Vitals Cooldown");
+        CheatToggles.noVitalsCooldown = GUILayout.Toggle(CheatToggles.noVitalsCooldown, " Без перезарядки виталов");
     }
 
     private void DrawDetective()
     {
-        GUILayout.Label("Detective", GUIStylePreset.TabSubtitle);
+        GUILayout.Label("Детектив", GUIStylePreset.TabSubtitle);   // Подзаголовок: "Детектив"
 
-        CheatToggles.interrogateReach = GUILayout.Toggle(CheatToggles.interrogateReach, " Interrogate Reach");
+        CheatToggles.interrogateReach = GUILayout.Toggle(CheatToggles.interrogateReach, " Дальность допроса");
     }
 }
