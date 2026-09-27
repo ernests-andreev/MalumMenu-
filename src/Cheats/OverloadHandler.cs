@@ -6,17 +6,18 @@ using System.Linq;
 namespace MalumMenu;
 public static class OverloadHandler
 {
-    public static float cooldown;
-    public static int strength;
-    private static HashSet<int> _customTargets = new();
-    private static float _timer;
-    private static float _attackLogTimer;
-    private static Dictionary<int, int> _rpcCounters = new();
-    private static int _nextTarget = int.MinValue;
-    private static bool _hasRun;
+    public static float cooldown;                           // Кулдаун между отправками
+    public static int strength;                             // Сила атаки (кол-во RPC)
+    private static HashSet<int> _customTargets = new();     // Кастомные цели (по ClientId)
+    private static float _timer;                            // Таймер до следующей отправки
+    private static float _attackLogTimer;                   // Таймер до следующего лога атаки
+    private static Dictionary<int, int> _rpcCounters = new(); // Счётчики отправленных RPC по каждому клиенту
+    private static int _nextTarget = int.MinValue;          // Следующая цель в очереди
+    private static bool _hasRun;                            // Был ли уже запущен overload в этой итерации
 
     public static void Run()
     {
+        // Если overload выключен или нет целей — сбрасываем состояние
         if (!CheatToggles.runOverload || OverloadUI.currentTargets.Count <= 0)
         {
             _timer = cooldown;
@@ -32,11 +33,11 @@ public static class OverloadHandler
 
         if (_timer >= cooldown)
         {
-            // If all possible targets are selected...
+            // Если выбраны все возможные цели...
 
             if (OverloadUI.maxPossibleTargets == OverloadUI.currentTargets.Count)
             {
-                int broadcastId = -1; // ... it is more efficient to broadcast RPCs
+                int broadcastId = -1; // ... эффективнее использовать широковещательную рассылку RPC
 
                 Utils.Overload(broadcastId, strength);
                 _timer -= cooldown;
@@ -53,12 +54,12 @@ public static class OverloadHandler
 
                         int newRpcCount = rpcCount + strength;
 
-                        // Log number of broadcasted RPCs since last log
-                        // At most logs once per attackLogDelay interval (in seconds)
+                        // Логируем число разосланных RPC с момента последнего лога
+                        // Логируется не чаще, чем раз в attackLogDelay (в секундах)
 
                         if (_attackLogTimer >= MalumMenu.attackLogDelay.Value)
                         {
-                            OverloadUI.LogConsole($"> <b><color=#{colorStr}>Broadcasted {newRpcCount} malformed RPCs to all players (ID : {broadcastId})</color></b>");
+                            OverloadUI.LogConsole($"> <b><color=#{colorStr}>Разослано {newRpcCount} повреждённых RPC всем игрокам (ID : {broadcastId})</color></b>");
 
                             _attackLogTimer -= MalumMenu.attackLogDelay.Value;
 
@@ -69,9 +70,9 @@ public static class OverloadHandler
                             _rpcCounters[broadcastId] = newRpcCount;
                         }
                     }
-                    else // Log every single broadcast instead if using verbose logging
+                    else // Логируем каждую рассылку отдельно, если включены подробные логи
                     {
-                        OverloadUI.LogConsole($"> <b><color=#{colorStr}>Broadcasted {strength} malformed RPCs to all players (ID : {broadcastId})</color></b>");
+                        OverloadUI.LogConsole($"> <b><color=#{colorStr}>Разослано {strength} повреждённых RPC всем игрокам (ID : {broadcastId})</color></b>");
                     }
                 }
 
@@ -86,7 +87,7 @@ public static class OverloadHandler
 
                 if (!_hasRun)
                 {
-                    if (_nextTarget == int.MinValue || clientId == _nextTarget) // No marked target (new cycle) OR clientId is the marked target
+                    if (_nextTarget == int.MinValue || clientId == _nextTarget) // Нет отмеченной цели (новый цикл) ИЛИ clientId — отмеченная цель
                     {
                         Utils.Overload(clientId, strength);
                         _timer -= cooldown;
@@ -105,36 +106,36 @@ public static class OverloadHandler
 
                                 _rpcCounters[clientId] = newRpcCount;
                             }
-                            else // Log every single send if using verbose logging
+                            else // Логируем каждую отправку отдельно, если включены подробные логи
                             {
-                                OverloadUI.LogConsole($"> <b><color=#{colorStr}>Sent {strength} malformed RPCs to {targetData.DefaultOutfit.PlayerName} (ID : {clientId})</color></b>");
+                                OverloadUI.LogConsole($"> <b><color=#{colorStr}>Отправлено {strength} повреждённых RPC игроку {targetData.DefaultOutfit.PlayerName} (ID : {clientId})</color></b>");
                             }
                         }
 
-                        _hasRun = true; // Mark that an overload has run this iteration
+                        _hasRun = true; // Отмечаем, что overload уже запущен в этой итерации
                     }
                 }
-                else // If an overload has run this iteration...
-                    // (will always have been previous player sequentially)
+                else // Если overload уже запущен в этой итерации...
+                    // (всегда был у предыдущего игрока последовательно)
                 {
-                    // Mark current player to be target in following iteration
+                    // Отмечаем текущего игрока как цель для следующей итерации
                     _nextTarget = clientId;
                     _hasRun = false;
 
-                    // End so following iteration can directly start after cooldown
+                    // Выходим, чтобы следующая итерация началась сразу после кулдауна
                     return;
                 }
             }
 
-            // After a full iteration (cycle ended)...
+            // После полной итерации (цикл завершился)...
 
-            // ... (1) Reset state to begin cycle again from first player
+            // ... (1) Сбрасываем состояние, чтобы начать цикл снова с первого игрока
 
             _nextTarget = int.MinValue;
             _hasRun = false;
 
-            // ... (2) Log number of sent RPCs since last log for all currentTargets
-            // At most logs once per attackLogDelay interval (in seconds)
+            // ... (2) Логируем число отправленных RPC с последнего лога для всех currentTargets
+            // Логируется не чаще, чем раз в attackLogDelay (в секундах)
 
             if (!CheatToggles.olVerboseLogs)
             {
@@ -151,7 +152,7 @@ public static class OverloadHandler
 
                         if (playerData != null)
                         {
-                            OverloadUI.LogConsole($"> <b><color=#{colorStr}>Sent {rpcCount} malformed RPCs to {playerData.DefaultOutfit.PlayerName} (ID : {clientId})</color></b>");
+                            OverloadUI.LogConsole($"> <b><color=#{colorStr}>Отправлено {rpcCount} повреждённых RPC игроку {playerData.DefaultOutfit.PlayerName} (ID : {clientId})</color></b>");
                         }
                     }
 
@@ -167,34 +168,40 @@ public static class OverloadHandler
         }
     }
 
+    // Добавляет игрока в список кастомных целей
     public static void AddCustomTarget(NetworkedPlayerInfo playerData)
     {
         int clientId = playerData.ClientId;
         _customTargets.Add(clientId);
     }
 
+    // Удаляет игрока из списка кастомных целей
     public static void RemoveCustomTarget(NetworkedPlayerInfo playerData)
     {
         int clientId = playerData.ClientId;
         _customTargets.Remove(clientId);
     }
 
+    // Проверяет, является ли игрок кастомной целью
     public static bool IsCustomTarget(NetworkedPlayerInfo playerData)
     {
         return _customTargets.Contains(playerData.ClientId);
     }
 
+    // Определяет, является ли игрок целью и по каким фильтрам
     public static (HashSet<TargetType> targetTypes, bool isTarget) GetTarget(NetworkedPlayerInfo playerData)
     {
         bool isTarget = false;
         var targetTypes = new HashSet<TargetType>();
 
+        // Фильтр "Все"
         if (CheatToggles.overloadAll)
         {
             targetTypes.Add(TargetType.All);
             isTarget = true;
         }
 
+        // Фильтр "Хост"
         bool hostTarget = CheatToggles.overloadHost && AmongUsClient.Instance.HostId == playerData.ClientId;
         if (hostTarget)
         {
@@ -206,6 +213,7 @@ public static class OverloadHandler
         {
             RoleTeamTypes roleTeamType = playerData.Role.TeamType;
 
+            // Фильтр "Члены экипажа"
             bool crewTarget = CheatToggles.overloadCrew && roleTeamType.Equals(RoleTeamTypes.Crewmate);
             if (crewTarget)
             {
@@ -213,6 +221,7 @@ public static class OverloadHandler
                 isTarget = true;
             }
 
+            // Фильтр "Предатели"
             bool impTarget = CheatToggles.overloadImps && roleTeamType.Equals(RoleTeamTypes.Impostor);
             if (impTarget)
             {
@@ -221,6 +230,7 @@ public static class OverloadHandler
             }
         }
 
+        // Фильтр "Кастомные цели"
         bool customTarget = IsCustomTarget(playerData);
         if (customTarget)
         {
@@ -236,13 +246,14 @@ public static class OverloadHandler
         return (targetTypes, isTarget);
     }
 
+    // Очищает список кастомных целей
     public static void ClearCustomTargets()
     {
         _customTargets.Clear();
     }
 
-    // Iterates through all given players and
-    // adds all that are marked as targets and match given targetType to _customTargets
+    // Проходит по всем заданным игрокам и
+    // добавляет всех, кто отмечен как цель и совпадает с заданным targetType, в _customTargets
     public static void PopulateCustomTargets(PlayerControl[] players, TargetType targetType)
     {
         int playerCount = players.Length;
@@ -264,18 +275,18 @@ public static class OverloadHandler
         }
     }
 
-    // Returns adapted strength and cooldown using number of currentTargets and AmongUsClient ping
-    // Should balance them to aim for low lag but effective output
+    // Возвращает адаптированные силу и кулдаун, используя число currentTargets и пинг AmongUsClient
+    // Балансирует их для минимальных лагов, но эффективного вывода
     public static (int strength, float cooldown) CalculateAdaptedValues()
     {
         int targetCount = OverloadUI.maxPossibleTargets == OverloadUI.currentTargets.Count
-                        ? 1 // Broadcast mode counts as one target
-                        : Math.Max(1, OverloadUI.currentTargets.Count); // Prevents division by 0
+                        ? 1 // Режим широковещания считается как одна цель
+                        : Math.Max(1, OverloadUI.currentTargets.Count); // Защита от деления на 0
 
         float maxCooldown = MalumMenu.adaptMaxCooldown.Value;
         float cooldown = maxCooldown / targetCount;
 
-        int pingLevel = Math.Max(1, Utils.GetPing() / 100); // 0-99 ms = Lvl 1, 100-199 ms = Lvl 1, 200-299 ms = Lvl 2, ...
+        int pingLevel = Math.Max(1, Utils.GetPing() / 100); // 0-99 мс = Ур. 1, 100-199 мс = Ур. 1, 200-299 мс = Ур. 2, ...
 
         int maxStrength = MalumMenu.adaptMaxStrength.Value;
         int strength = Math.Max(1, maxStrength / pingLevel / targetCount);
@@ -283,13 +294,14 @@ public static class OverloadHandler
         return (strength, cooldown);
     }
 
+    // Типы целей для фильтров overload
     public enum TargetType
     {
-        None,
-        All,
-        Custom,
-        Host,
-        Impostor,
-        Crewmate
+        None,       // Нет
+        All,        // Все
+        Custom,     // Кастомные
+        Host,       // Хост
+        Impostor,   // Предатели
+        Crewmate    // Члены экипажа
     }
 }
