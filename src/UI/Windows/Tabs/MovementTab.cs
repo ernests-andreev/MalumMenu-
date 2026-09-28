@@ -22,7 +22,7 @@ public class MovementTab : ITab
 
     private void DrawGeneral()
     {
-        CheatToggles.noClip = GUILayout.Toggle(CheatToggles.noClip, " Прохождение сквозь стены (NoClip)");
+        CheatToggles.noClip = GUILayout.Toggle(CheatToggles.noClip, " Нет колизии стен(Noclip)");
 
         CheatToggles.invertControls = GUILayout.Toggle(CheatToggles.invertControls, " Инверсия управления");
 
@@ -49,8 +49,8 @@ public class MovementTab : ITab
     {
         GUILayout.Label("Телепортация", GUIStylePreset.TabSubtitle);     // Подзаголовок: "Телепортация"
 
-        CheatToggles.teleportCursor = GUILayout.Toggle(CheatToggles.teleportCursor, " к курсору");
+        CheatToggles.teleportCursor = GUILayout.Toggle(CheatToggles.teleportCursor, " ТП к курсору");
 
-        CheatToggles.teleportPlayer = GUILayout.Toggle(CheatToggles.teleportPlayer, " к игроку");
+        CheatToggles.teleportPlayer = GUILayout.Toggle(CheatToggles.teleportPlayer, " ТП к игроку");
     }
 }
