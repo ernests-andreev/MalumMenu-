@@ -78,7 +78,7 @@ public class RolesTab : ITab
     {
         GUILayout.Label("Член экипажа", GUIStylePreset.TabSubtitle);   // Подзаголовок: "Член экипажа"
 
-        CheatToggles.showTasksMenu = GUILayout.Toggle(CheatToggles.showTasksMenu, " Показать меню задач");
+        CheatToggles.showTasksMenu = GUILayout.Toggle(CheatToggles.showTasksMenu, " Показать меню заданий");
     }
 
     private void DrawTracker()
@@ -98,9 +98,9 @@ public class RolesTab : ITab
     {
         GUILayout.Label("Инженер", GUIStylePreset.TabSubtitle);   // Подзаголовок: "Инженер"
 
-        CheatToggles.endlessVentTime = GUILayout.Toggle(CheatToggles.endlessVentTime, " Бесконечное время в вентиляции");
+        CheatToggles.endlessVentTime = GUILayout.Toggle(CheatToggles.endlessVentTime, " Бесконечное время в люке");
 
-        CheatToggles.noVentCooldown = GUILayout.Toggle(CheatToggles.noVentCooldown, " Без перезарядки вентиляции");
+        CheatToggles.noVentCooldown = GUILayout.Toggle(CheatToggles.noVentCooldown, " Без перезарядки люка");
     }
 
     private void DrawScientist()
