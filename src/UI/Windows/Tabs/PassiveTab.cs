@@ -19,7 +19,7 @@ public class PassiveTab : ITab
     {
         CheatToggles.freeCosmetics = GUILayout.Toggle(CheatToggles.freeCosmetics, " Бесплатная косметика");
 
-        CheatToggles.avoidPenalties = GUILayout.Toggle(CheatToggles.avoidPenalties, " Избегать штрафов");
+        CheatToggles.avoidPenalties = GUILayout.Toggle(CheatToggles.avoidPenalties, " Анти бан \ кик (системой)");
 
         CheatToggles.unlockFeatures = GUILayout.Toggle(CheatToggles.unlockFeatures, " Разблокировать доп. функции");
 
