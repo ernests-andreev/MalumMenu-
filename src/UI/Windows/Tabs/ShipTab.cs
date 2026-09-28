@@ -48,13 +48,13 @@ public class ShipTab : ITab
     {
         GUILayout.Label("Саботаж", GUIStylePreset.TabSubtitle);     // Подзаголовок: "Саботаж"
 
-        CheatToggles.reactorSab = GUILayout.Toggle(CheatToggles.reactorSab, " Реактор");
+        CheatToggles.reactorSab = GUILayout.Toggle(CheatToggles.reactorSab, " Реактора");
 
-        CheatToggles.oxygenSab = GUILayout.Toggle(CheatToggles.oxygenSab, " Кислород");
+        CheatToggles.oxygenSab = GUILayout.Toggle(CheatToggles.oxygenSab, " Кислорода");
 
-        CheatToggles.elecSab = GUILayout.Toggle(CheatToggles.elecSab, " Свет");
+        CheatToggles.elecSab = GUILayout.Toggle(CheatToggles.elecSab, " Сломать свет");
 
-        CheatToggles.commsSab = GUILayout.Toggle(CheatToggles.commsSab, " Связь");
+        CheatToggles.commsSab = GUILayout.Toggle(CheatToggles.commsSab, " Саботаж связи");
 
         CheatToggles.showDoorsMenu = GUILayout.Toggle(CheatToggles.showDoorsMenu, " Показать меню дверей");
 
