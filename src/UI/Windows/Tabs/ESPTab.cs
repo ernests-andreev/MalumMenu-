@@ -63,7 +63,7 @@ public class ESPTab : ITab
 
     private void DrawTracers()
     {
-        GUILayout.Label("Трассеры", GUIStylePreset.TabSubtitle);    // Подзаголовок: "Трассеры"
+        GUILayout.Label("Лучи", GUIStylePreset.TabSubtitle);    // Подзаголовок: "Трассеры"
 
         CheatToggles.tracersCrew = GUILayout.Toggle(CheatToggles.tracersCrew, " Члены экипажа");
 
