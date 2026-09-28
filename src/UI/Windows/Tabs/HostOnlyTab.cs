@@ -35,7 +35,7 @@ public class HostOnlyTab : ITab
 
     private void DrawGeneral()
     {
-        CheatToggles.killVanished = GUILayout.Toggle(CheatToggles.killVanished, " Убивать невидимых");
+        CheatToggles.killVanished = GUILayout.Toggle(CheatToggles.killVanished, " Убивать в невидимости");
 
         CheatToggles.killAnyone = GUILayout.Toggle(CheatToggles.killAnyone, " Убивать любого");
 
@@ -67,7 +67,7 @@ public class HostOnlyTab : ITab
     {
         GUILayout.Label("Состояние игры", GUIStylePreset.TabSubtitle);    // Подзаголовок: "Состояние игры"
 
-        CheatToggles.forceStartGame = GUILayout.Toggle(CheatToggles.forceStartGame, " Форсировать старт игры");
+        CheatToggles.forceStartGame = GUILayout.Toggle(CheatToggles.forceStartGame, " Принудительный старт игры");
 
         CheatToggles.noGameEnd = GUILayout.Toggle(CheatToggles.noGameEnd, " Без завершения игры");
     }
