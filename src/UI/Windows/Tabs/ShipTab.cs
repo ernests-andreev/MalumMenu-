@@ -69,10 +69,10 @@ public class ShipTab : ITab
     {
         GUILayout.Label("Вентиляция", GUIStylePreset.TabSubtitle);   // Подзаголовок: "Вентиляция"
 
-        CheatToggles.unlockVents = GUILayout.Toggle(CheatToggles.unlockVents, " Разблокировать вентиляцию");
+        CheatToggles.unlockVents = GUILayout.Toggle(CheatToggles.unlockVents, " Разблокировать люки");
 
-        CheatToggles.kickVents = GUILayout.Toggle(CheatToggles.kickVents, " Выкинуть всех из вентиляции");
+        CheatToggles.kickVents = GUILayout.Toggle(CheatToggles.kickVents, " Кикнуть всех из люкоы");
 
-        CheatToggles.walkInVents = GUILayout.Toggle(CheatToggles.walkInVents, " Ходить в вентиляции");
+        CheatToggles.walkInVents = GUILayout.Toggle(CheatToggles.walkInVents, " Ходить в люке");
     }
 }
